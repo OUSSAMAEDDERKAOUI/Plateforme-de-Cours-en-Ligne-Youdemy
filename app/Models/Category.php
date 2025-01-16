@@ -57,6 +57,13 @@ class Category {
     public function setCategoryStatus($categoryStatus) {
         $this->categoryStatus = $categoryStatus;
     }
+    
+
+
+
+
+
 }
+
 
 ?>

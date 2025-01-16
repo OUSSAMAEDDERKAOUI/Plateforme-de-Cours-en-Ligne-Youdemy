@@ -15,7 +15,7 @@ is_valid=0;
     // Regex pour l'email
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 
-    // Regex pour le mot de passe : min 8 caractères, 1 majuscule, 1 chiffre, 1 caractère spécial
+    // Regex pour le mot de passe 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
     // Validation des champs

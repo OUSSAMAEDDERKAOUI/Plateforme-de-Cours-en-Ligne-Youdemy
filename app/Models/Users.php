@@ -8,14 +8,17 @@ protected $lName;
 protected $email;
 protected $password;
 protected $role;
+protected $status;
 
 
-public function __construct($fName,$lName,$email,$password,$role){
+public function __construct($fName,$lName,$email,$password,$role,$status){
     $this->fName=$fName;
     $this->lName=$lName;
     $this->email=$email;
     $this->password=$password;
     $this->role=$role;
+    $this->status=$status;
+
 }
 
 // -------------------Getters-------------------------
@@ -38,6 +41,9 @@ public function getpassword(){
 public function getRole(){
     return $this->role;
 }
+public function getStatus(){
+    return $this->status;
+}
 
 
 
@@ -59,17 +65,18 @@ public function setpassword($password){
 public function setRole($role){
     $this->role =$role;
 }
-
+public function setStatus($status){
+    $this->status =$status;
+}
 
 public function signup()
 {
-    //Vérifier si tous les champs sont remplis
-    if (empty($this->fName) || empty($this->lName) || empty($this->email) || empty($this->password) || empty($this->role)) {
+    if (empty($this->fName) || empty($this->lName) || empty($this->email) || empty($this->password) || empty($this->role) || empty($this->status)) {
         echo "Tous les champs sont obligatoires";
         return;
     }
 
-    // Validation du prénom et du nom : lettres, espaces, apostrophes et tirets uniquement
+    // Validation du prénom et du nom 
     $nameRegex = '/^[A-Za-zÀ-ÿÉéÈèÊêËëÏïÎîÔôÖöÙùÜüÇç\' -]+$/';
 
     if (!preg_match($nameRegex, $this->fName)) {
@@ -82,58 +89,84 @@ public function signup()
         return;
     }
 
-    // Validation de l'email avec une expression régulière
+    // Validation de l'email 
     if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
         echo "L'email fourni n'est pas valide.";
         return;
     }
 
-    // Expression régulière pour la validation d'un mot de passe
-    // Exemple : Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre
     if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/', $this->password)) {
         echo "Le mot de passe doit comporter au moins 8 caractères, une majuscule, une minuscule et un chiffre.";
         return;
     }
 
-    // Connexion à la base de données et vérification si l'email existe déjà
     $sql = "SELECT * FROM users WHERE email = :email";
     $stmt = Database::getInstance()->getConnection()->prepare($sql);
     $stmt->bindParam(":email", $this->email, PDO::PARAM_STR);
     $stmt->execute();
 
-    // Vérifier si l'email existe déjà
     if ($stmt->rowCount() > 0) {
         echo "Un utilisateur avec cet email existe déjà.";
         return;
     } else {
-        // Hacher le mot de passe
         $hashedPassword = password_hash($this->password, PASSWORD_DEFAULT);
 
-        // Préparer la requête d'insertion
-        $query = "INSERT INTO `users`(`first_name`, `last_name`, `email`, `password`, `role`) 
-                  VALUES (:nom, :prenom, :email, :password, :role)";
+        $query = "INSERT INTO `users`(`first_name`, `last_name`, `email`, `password`, `role`,`user_status`) 
+                  VALUES (:nom, :prenom, :email, :password, :role, :status)";
         $stmt = Database::getInstance()->getConnection()->prepare($query);
 
-        // Lier les paramètres
         $stmt->bindParam(":nom", $this->lName, PDO::PARAM_STR);
         $stmt->bindParam(':prenom', $this->fName, PDO::PARAM_STR);
         $stmt->bindParam(':email', $this->email, PDO::PARAM_STR);
         $stmt->bindParam(':password', $hashedPassword, PDO::PARAM_STR);
         $stmt->bindParam(':role', $this->role, PDO::PARAM_STR);
+        $stmt->bindParam(':status', $this->status, PDO::PARAM_STR);
 
         try {
-            // Exécuter la requête
             $stmt->execute();
             // echo "Inscription réussie !";
         } catch (PDOException $e) {
-            // En cas d'erreur lors de l'insertion
             throw new Exception('Une erreur est survenue lors de l\'inscription : ' . $e->getMessage(), (int)$e->getCode());
         }
     }
 }
 
 
+public  function login($postEmail , $postPassword){
 
+    $stmt= Database::getInstance()->getConnection()->prepare(" SELECT * FROM users WHERE users.email=:email AND user_status='accepté'");
+
+    $stmt->bindParam(':email',$postEmail,PDO::PARAM_STR);
+    try {
+      $stmt->execute();
+      $result = $stmt->fetch(PDO::FETCH_ASSOC);
+      
+      if (empty($result)) {
+          throw new Exception('Aucun résultat trouvé.'); 
+      } else {
+        
+          if (password_verify($postPassword, $result['password'])) {
+            $this->userId = $result['user_id'];
+            $this->lName =$result['last_name'];
+            $this->fName=$result['first_name'];
+            $this->email=$result['email'];
+            $this->role=$result['role'];
+            echo'ZZZZZZ';
+
+            return $this;
+          }
+      }
+      }
+   catch (PDOException $e) {
+      throw new Exception('Erreur de base de données : ' . $e->getMessage());
+  } catch (Exception $e) {
+      throw new Exception($e->getMessage());
+  }
+    
+
+
+
+   }
 
 
 

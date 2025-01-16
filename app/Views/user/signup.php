@@ -1,6 +1,8 @@
 <?php
 
-require_once '../../Models/Users.php';
+require_once '../../Models/Etudiants.php';
+require_once '../../Models/Enseignants.php';
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -13,13 +15,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = $_POST['email'];
         $password = $_POST['password'];
         
-        $membre = new Users($nom, $prenom, $email, $password, $role);
 
         try {
             // Users::signup($nom, $prenom, $email, $password,$role);
-            $membre->signup();
-            // echo'holaaaa&13';
-            header("location: ./login.php");
+            if( $role==='etudiant'){
+                $status='accepté' ;
+                $etudiant = new Etudiants($nom, $prenom, $email, $password, $role,$status);
+
+                $etudiant->signup();
+                // echo'holaaaa&13';
+                // header("location: ./login.php");
+            }
+            else  if( $role==='enseignant'){
+                $status='en attente' ;
+
+                $enseignant = new Enseignants($nom, $prenom, $email, $password, $role,$status);
+                $enseignant->signup();
+                // echo'holaaaa&13';
+                // header("location: ./login.php");
+            }
+           
         } catch (Exception $e) {
             echo "Erreur lors de l'inscription : " . htmlspecialchars($e->getMessage());
         }
@@ -28,8 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
     //   header('Location: ../views/login.php')
-
-
 
 ?>
 

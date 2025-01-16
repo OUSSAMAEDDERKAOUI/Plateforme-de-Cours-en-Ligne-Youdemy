@@ -17,7 +17,7 @@ class Database {
 
     public static function getInstance($dsn = null, $username = null, $password = null) {
         if (self::$instance === null) {
-            $dsn = $dsn ?? 'mysql:host=localhost;dbname=youdemy';
+            $dsn = $dsn ?? 'mysql:host=localhost;dbname=youdemy;charset=utf8mb4'; 
             $username = $username ?? 'root';
             $password = $password ?? '';
             self::$instance = new Database($dsn, $username, $password);

@@ -1,3 +1,64 @@
+<?php
+require_once __DIR__.'../../../Models/Users.php';
+if($_SERVER['REQUEST_METHOD']==='POST'){
+    echo'1';
+    if(isset($_POST['login'])){
+        echo'2';
+       
+        $postEmail = htmlspecialchars(trim(string: $_POST['email']));
+        $postPassword =htmlspecialchars( $_POST['password']);
+
+        if (empty($postEmail) || empty($postPassword)) {
+            echo'3';
+
+            echo "Veuillez remplir tous les champs.";
+        }else {
+            echo'4';
+
+            $user = new Users("","","","","","");
+
+            $loggedInUser = $user->login( $postEmail, $postPassword);
+
+            if ($loggedInUser) {
+                
+                echo'5';
+
+                $_SESSION['user_id'] = $loggedInUser->getidUser();
+                $_SESSION['user_prenom'] = $loggedInUser->getfName();
+                $_SESSION['user_nom'] = $loggedInUser->getlName();
+                $_SESSION['user_email'] = $loggedInUser->getEmail();
+                $_SESSION['user_role'] = $loggedInUser->getRole();
+
+echo  $_SESSION['user_role'];
+                header('Location: ../course/index.php');
+
+
+
+                // header('Location: ../views/'.$_SESSION['user_role'].'.php');
+                // if($_SESSION['user_role'] ==='admin'){
+                //     header("Location: ../views/admin.php");
+                // }else if($_SESSION['user_role'] ==='membre'){
+                //     header("Location: ../views/membre.php");
+                // } else if($_SESSION['user_role'] ==='auteur'){
+                //     header("Location: ../views/auteur.php");
+                    
+                // }
+
+
+                exit;
+            } else {
+                echo'6--------------------------';
+
+                echo "Identifiants incorrects.";
+            }
+        }
+        
+    }
+
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,7 +86,7 @@
                 </h2>
                 
             </div>
-            <form method="POST" action="../functions/login.php" id="loginForm" class="mt-8 space-y-6">
+            <form method="POST" action="" id="loginForm" class="mt-8 space-y-6">
                 <div class="rounded-md shadow-sm flex flex-col gap-5">
                     <div>
                         <label for="email" class="sr-only">Adresse email</label>
@@ -51,7 +112,7 @@
                         </a>
                     </div>
                 </div>
-
+                <div id="error-message" class="text-red-600 text-sm mt-2"></div>
                 <div>
                     <button type="submit" name="login" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
                         <span class="absolute left-0 inset-y-0 flex items-center pl-3">
@@ -69,5 +130,7 @@
             </form>
         </div>
     </main>
+    <script src="../../../public/assets/js/regex_login.js"></script>
+
 </body>
 </html>
