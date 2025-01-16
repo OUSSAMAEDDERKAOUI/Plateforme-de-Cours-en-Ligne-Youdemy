@@ -1,3 +1,23 @@
+<?php
+
+require_once __DIR__.'../../../Models/Category.php';
+
+if($_SERVER['REQUEST_METHOD']==='POST'){
+
+    if(isset($_POST['addCategory'])){
+        $titre=htmlspecialchars($_POST['titre']);
+        $description =htmlspecialchars($_POST['description']);
+
+        $Category=new Category($titre,$description,null,null);
+        $Category->addCategory();
+
+    }
+
+}
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -163,10 +183,10 @@
                     <p class="text-sm text-gray-500">${category.coursesCount} cours</p>
                 </div>
                 <div class="space-x-2">
-                    <button onclick="editCategory(${category.id})" class="text-indigo-600 hover:text-indigo-900">
+                    <button  class="text-indigo-600 hover:text-indigo-900">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button onclick="deleteCategory(${category.id})" class="text-red-600 hover:text-red-900">
+                    <button  class="text-red-600 hover:text-red-900">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -201,28 +221,32 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <form id="categoryForm" onsubmit="submitCategory(event)" class="space-y-4">
+        <form id="categoryForm" method="POST" class="space-y-4">
             <div>
                 <label for="categoryName" class="block text-sm font-medium text-gray-700">Nom de la catégorie</label>
                 <input type="text" 
                        id="categoryName" 
                        required 
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" name="titre">
             </div>
+            <div id="error-message-name" class="text-red-600 text-sm mt-2"></div>
+
             <div>
                 <label for="categoryDescription" class="block text-sm font-medium text-gray-700">Description</label>
                 <textarea id="categoryDescription" 
                           rows="3" 
-                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" name="description"></textarea>
             </div>
+            <div id="error-message-desc" class="text-red-600 text-sm mt-2"></div>
+
             <div class="flex justify-end space-x-3">
-                <button type="button" 
+                <button 
                         onclick="closeCategoryModal()" 
                         class="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50">
                     Annuler
                 </button>
-                <button type="submit" 
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                <button 
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" name="addCategory">
                     Ajouter
                 </button>
             </div>
@@ -233,7 +257,19 @@
 
 </div>
    
+<script>
+    function closeCategoryModal() {
+    document.getElementById('categoryModal').classList.remove('flex');
+    document.getElementById('categoryModal').classList.add('hidden');
+    document.getElementById('categoryForm').reset();
+}
+function showAddCategoryModal() {
+    document.getElementById('categoryModal').classList.remove('hidden');
+    document.getElementById('categoryModal').classList.add('flex');
+}
 
-    </script>
+</script>
+<script src="../../../public/assets/js/category.js"></script>
+
 </body>
 </html>
