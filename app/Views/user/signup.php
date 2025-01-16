@@ -1,3 +1,40 @@
+<?php
+
+require_once '../../Models/Users.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    if (isset($_POST['regester'])) {
+        
+
+        $nom = htmlspecialchars($_POST['nom']);
+        $prenom = htmlspecialchars($_POST['prenom']);
+        $role = htmlspecialchars($_POST['role']);
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+        
+        $membre = new Users($nom, $prenom, $email, $password, $role);
+
+        try {
+            // Users::signup($nom, $prenom, $email, $password,$role);
+            $membre->signup();
+            // echo'holaaaa&13';
+            header("location: ./login.php");
+        } catch (Exception $e) {
+            echo "Erreur lors de l'inscription : " . htmlspecialchars($e->getMessage());
+        }
+    } else {
+        echo "Veuillez remplir tous les champs du formulaire.";
+    }
+}
+    //   header('Location: ../views/login.php')
+
+
+
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,7 +61,7 @@
                 </h2>
                
             </div>
-            <form id="registerForm" class="mt-8 space-y-6" action="../functions/signup.php" method="POST" enctype="multipart/form-data">
+            <form id="registerForm" class="mt-8 space-y-6" action="" method="POST" >
                 <div class="rounded-md shadow-sm flex flex-col gap-5">
                     <div>
                         <label for="prenom" class="sr-only">Prenom</label>
@@ -37,8 +74,8 @@
                     <div>
                         <label for="role" class="sr-only">Identité</label>
                         <select name="role" id="role" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm">
-                            <option>Membre</option>
-                            <option>Auteur</option>
+                            <option>enseignant</option>
+                            <option>etudiant</option>
                         </select>
                     </div>
                     <div>
@@ -50,19 +87,10 @@
                         <input id="password" name="password" type="password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm" placeholder="Mot de passe">
                     </div>
                 </div>
+                <div id="error-message" class="text-red-600 text-sm mt-2"></div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">image</label>
-                        <input
-                             type="file" name="image"
-                                required
-                                class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-200"
-                                >
-                </div>
-
-
-                <div>
-                    <button type="submit" name="signup" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                    <button  name="regester" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
                         <span class="absolute left-0 inset-y-0 flex items-center pl-3">
                             <i class="fas fa-user-plus"></i>
                         </span>
@@ -78,5 +106,7 @@
             </form>
         </div>
     </main>
+    <script src="../../../public/assets/js/regex_regester.js"></script>
+
 </body>
 </html>
