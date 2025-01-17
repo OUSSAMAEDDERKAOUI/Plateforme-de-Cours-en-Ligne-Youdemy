@@ -7,31 +7,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['addCategory'])) {
         $titre = htmlspecialchars($_POST['titre']);
         $description = htmlspecialchars($_POST['description']);
-        $Category = new Category($titre, $description, null, null);
+        $upload_img = $_FILES['category_image'];
+
+        $Category = new Category($titre, $description, null, null,$upload_img);
 
         $Category->addCategory();
+        header('Location: ' . $_SERVER['PHP_SELF']);
+
     }
     if (isset($_POST['delete'])) {
         $categoryId = htmlspecialchars($_GET['id']);
         echo $_GET['id'];
-        $Category = new Category("", "", "", "");
+        $Category = new Category("", "", "", "","");
 
         $Category->deleteCategory($categoryId);
         header('Location: ' . $_SERVER['PHP_SELF']);
     }
     if (isset($_POST['update'])) {
         $categoryId = htmlspecialchars($_GET['id']);
-        $Category = new Category("", "", "", "");
+        $Category = new Category("", "", "", "","");
 
-        $res=$Category->getCategoryById($categoryId);
+        $resu=$Category->getCategoryById($categoryId);
 
     }
     if (isset($_POST['modifyCat'])) {
         $titre = htmlspecialchars($_POST['updateTitle']);
         $description = htmlspecialchars($_POST['updateDescription']);
         $categoryId = htmlspecialchars($_GET['id']);
+
+        $upload_cvr = $_FILES['update_image'];
+
         echo $description;
-        $Category = new Category($titre, $description, null, null);
+        $Category = new Category($titre, $description, null, null,$upload_cvr);
 
         $Category->setCategoryId($categoryId);
         
@@ -101,9 +108,15 @@ if ($_SERVER['REQUEST_METHOD']!=='POST' || isset($_POST['delete'])) {
                         </a>
                     </li>
                     <li>
-                        <a href="./dashboard_admin_category_tags.php" class="w-full flex items-center p-2 hover:bg-indigo-700 rounded">
+                        <a href="./dashboard_admin_category.php" class="w-full flex items-center p-2 hover:bg-indigo-700 rounded">
                             <i class="fas fa-tags w-6"></i>
-                            <span>Catégories & Tags</span>
+                            <span>Catégories</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="./dashboard_admin_tags.php" class="w-full flex items-center p-2 hover:bg-indigo-700 rounded">
+                            <i class="fas fa-tags w-6"></i>
+                            <span> Tags</span>
                         </a>
                     </li>
                 </ul>
@@ -267,92 +280,109 @@ if ($_SERVER['REQUEST_METHOD']!=='POST' || isset($_POST['delete'])) {
         </main>
     </div>
     <!-- Modal Ajout Catégorie -->
-    <div id="categoryModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
-        <div class="bg-white rounded-lg p-8 max-w-md w-full">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-semibold">Ajouter une catégorie</h3>
-                <button onclick="closeCategoryModal()" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form id="categoryForm" method="POST" class="space-y-4">
-                <div>
-                    <label for="categoryName" class="block text-sm font-medium text-gray-700">Nom de la catégorie</label>
-                    <input type="text"
-                        id="categoryName"
-                        required
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" name="titre">
-                </div>
-                <div id="error-message-name" class="text-red-600 text-sm mt-2"></div>
-
-                <div>
-                    <label for="categoryDescription" class="block text-sm font-medium text-gray-700">Description</label>
-                    <textarea id="categoryDescription"
-                        rows="3"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" name="description"></textarea>
-                </div>
-                <div id="error-message-desc" class="text-red-600 text-sm mt-2"></div>
-
-                <div class="flex justify-end space-x-3">
-                    <button
-                        onclick="closeCategoryModal()"
-                        class="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50">
-                        Annuler
-                    </button>
-                    <button
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" name="addCategory">
-                        Ajouter
-                    </button>
-                </div>
-            </form>
+<div id="categoryModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-semibold">Ajouter une catégorie</h3>
+            <button onclick="closeCategoryModal()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
-    </div>
-
-
-    <div id="modifyCategory2" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex  items-center justify-center <?php echo $formClass; ?> ">
-        <div class="bg-white rounded-lg p-8 max-w-md w-full">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-semibold">Modifier une catégorie</h3>
-                <button onclick="closeCategoryModall()" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <?php echo'<form method="POST" action="?id=' . htmlspecialchars($res['category_id']) . '">
+        <form id="categoryForm" method="POST" enctype="multipart/form-data" class="space-y-4">
             <div>
-                    <label for="categoryName" class="block text-sm font-medium text-gray-700">Nom de la catégorie</label>
-                    <input type="text"
-                    value=" '. $res["category_title"].' "
-                        id="categoryName"
-                        required
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" name="updateTitle">
-                </div>
-                <div id="error-message-name" class="text-red-600 text-sm mt-2"></div>
+                <label for="categoryName" class="block text-sm font-medium text-gray-700">Nom de la catégorie</label>
+                <input type="text"
+                    id="categoryName"
+                    required
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" name="titre">
+            </div>
+            <div id="error-message-name" class="text-red-600 text-sm mt-2"></div>
 
-                <div>
-                    <label for="categoryDescription" class="block text-sm font-medium text-gray-700">Description</label>
+            <div>
+                <label for="categoryDescription" class="block text-sm font-medium text-gray-700">Description</label>
+                <textarea id="categoryDescription"
+                    rows="3"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" name="description"></textarea>
+            </div>
+            <div id="error-message-desc" class="text-red-600 text-sm mt-2"></div>
 
-                    <textarea id="categoryDescription"
+            <div>
+                <label for="categoryImage" class="block text-sm font-medium text-gray-700">Image de la catégorie</label>
+                <input type="file"
+                    id="categoryImage"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" name="category_image" accept="image/*">
+            </div>
+            <div id="error-message-image" class="text-red-600 text-sm mt-2"></div>
 
-                        rows="3"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" name="updateDescription"> '. $res["category_description"].' </textarea>
-                </div>
-                <div id="error-message-desc" class="text-red-600 text-sm mt-2"></div>
-
-                <div class="flex justify-end space-x-3">
-                    <button
-                        type="button"
-                        onclick="closeCategoryModall()"
-                        class="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50">
-                        Annuler
-                    </button>
-                    <button
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" name="modifyCat">
-                        Modifier
-                    </button>
-                </div>
-            </form>';?>
-        </div>
+            <div class="flex justify-end space-x-3">
+                <button
+                    onclick="closeCategoryModal()"
+                    class="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50">
+                    Annuler
+                </button>
+                <button
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" name="addCategory">
+                    Ajouter
+                </button>
+            </div>
+        </form>
     </div>
+</div>
+
+
+<div id="modifyCategory2" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center <?php echo $formClass; ?> ">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-semibold">Modifier une catégorie</h3>
+            <button onclick="closeCategoryModall()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <?php echo '
+        <form method="POST" enctype="multipart/form-data" action="?id=' . htmlspecialchars($resu['category_id']) . '">
+            <div>
+                <label for="categoryName" class="block text-sm font-medium text-gray-700">Nom de la catégorie</label>
+                <input type="text"
+                    value="' . $resu["category_title"] . '"
+                    id="categoryName"
+                    required
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" name="updateTitle">
+            </div>
+            <div id="error-message-name" class="text-red-600 text-sm mt-2"></div>
+
+            <div>
+                <label for="categoryDescription" class="block text-sm font-medium text-gray-700">Description</label>
+                <textarea id="categoryDescription"
+                    rows="3"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" name="updateDescription">' . $resu["category_description"] . '</textarea>
+            </div>
+            <div id="error-message-desc" class="text-red-600 text-sm mt-2"></div>
+
+            <div>
+                <label for="categoryImage" class="block text-sm font-medium text-gray-700">Image de la catégorie</label>
+                <input type="file"
+                    id="categoryImage"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" name="update_image">
+                <div class="text-sm text-gray-500 mt-2">Formats autorisés : jpg, jpeg, png, gif.</div>
+            </div>
+
+            <div class="flex justify-end space-x-3">
+                <button
+                    type="button"
+                    onclick="closeCategoryModall()"
+                    class="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50">
+                    Annuler
+                </button>
+                <button
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" name="modifyCat">
+                    Modifier
+                </button>
+            </div>
+        </form>';
+        ?>
+    </div>
+</div>
+
 
 
     </div>
@@ -377,7 +407,7 @@ if ($_SERVER['REQUEST_METHOD']!=='POST' || isset($_POST['delete'])) {
             document.getElementById('modifyCategory2').classList.add('hidden');
         }
     </script>
-    <script src="../../../public/assets/js/category.js"></script>
+    <!-- <script src="../../../public/assets/js/category.js"></script> -->
 
 </body>
 
