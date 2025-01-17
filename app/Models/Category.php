@@ -8,7 +8,7 @@ class Category {
     protected $creationDate;          
     protected $categoryStatus;        
 
-    public function __construct($categoryTitle, $categoryDescription, $creationDate = null, $categoryStatus = null) {
+    public function __construct( $categoryTitle, $categoryDescription, $creationDate = null, $categoryStatus = null) {
         $this->categoryTitle = $categoryTitle;
         $this->categoryDescription = $categoryDescription;
         $this->creationDate = $creationDate ?? date('Y-m-d'); 
@@ -85,9 +85,9 @@ class Category {
     }
     
 public function showCategory() {
-    $stmt = Database::getInstance()->getConnection()->prepare("SELECT * FROM categorie
-        JOIN users ON categorie.id_admin = users.id_user
-        WHERE categorie.status = 'actif'");
+    $stmt = Database::getInstance()->getConnection()->prepare(" SELECT * FROM categories
+        
+        WHERE categories.category_status = 'actif'" );
 
     try {
         $stmt->execute();
@@ -110,31 +110,37 @@ public function showCategory() {
 }
 
 
-public function updateCategory($categoryTitle, $categoryId, $categoryStatus) {
-    $query = "UPDATE `categorie`
-              SET `titre` = :categoryTitle, `status` = :categoryStatus
-              WHERE `id_categorie` = :categoryId";
+public function updateCategory() {
+    if (empty($this->categoryTitle) || empty($this->categoryDescription) || empty($this->categoryId)) {
+        throw new InvalidArgumentException("Les informations nécessaires sont manquantes.");
+    }
+
+    $query = "UPDATE `categories`
+              SET `category_title` = :categoryTitle, `category_description` = :categoryDescription
+              WHERE `category_id` = :categoryId";
 
     $stmt = Database::getInstance()->getConnection()->prepare($query);
 
-    $stmt->bindValue(':categoryTitle', $categoryTitle, PDO::PARAM_STR);
-    $stmt->bindValue(':categoryStatus', $categoryStatus, PDO::PARAM_STR);
-    $stmt->bindValue(':categoryId', $categoryId, PDO::PARAM_INT);
+    $stmt->bindValue(':categoryTitle', $this->categoryTitle, PDO::PARAM_STR);
+    $stmt->bindValue(':categoryDescription', $this->categoryDescription, PDO::PARAM_STR);
+    $stmt->bindValue(':categoryId', $this->categoryId, PDO::PARAM_INT); 
 
     try {
         $stmt->execute();
+        echo 'La catégorie a été mise à jour avec succès.'; 
     } catch (PDOException $e) {
-        throw new PDOException($e->getMessage(), (int) $e->getCode());
+        throw new PDOException("Erreur lors de la mise à jour de la catégorie: " . $e->getMessage(), (int) $e->getCode());
     }
 }
 
 
 
 
+
 public function deleteCategory($categoryId) {
-    $query = "UPDATE `categorie`
-              SET `status` = 'annulee'
-              WHERE `id_categorie` = :categoryId";
+    $query = "UPDATE `categories`
+              SET `category_status` = 'inactif'
+              WHERE `category_id` = :categoryId";
 
     $stmt = Database::getInstance()->getConnection()->prepare($query);
     echo '1';
@@ -144,12 +150,21 @@ public function deleteCategory($categoryId) {
 
     try {
         $stmt->execute();
+        echo '3';
+
     } catch (PDOException $e) {
         throw new PDOException($e->getMessage(), (int) $e->getCode());
     }
 }
 
-
+public function getCategoryById($categoryId) {
+    $sql = "SELECT * FROM categories WHERE category_id = :id";
+    $stmt = Database::getInstance()->getConnection()->prepare($sql);
+    $stmt->bindParam(':id', $categoryId);
+    echo $categoryId;
+    $stmt->execute();
+    return $stmt->fetch();
+}
 
 
 }
