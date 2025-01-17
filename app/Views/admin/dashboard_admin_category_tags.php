@@ -26,7 +26,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $res=$Category->getCategoryById($categoryId);
 
     }
-   
+    if (isset($_POST['modifyCat'])) {
+        $titre = htmlspecialchars($_POST['updateTitle']);
+        $description = htmlspecialchars($_POST['updateDescription']);
+        $categoryId = htmlspecialchars($_GET['id']);
+        echo $description;
+        $Category = new Category($titre, $description, null, null);
+
+        $Category->setCategoryId($categoryId);
+        
+        $Category->updateCategory( );
+        header('Location: ' . $_SERVER['PHP_SELF']);
+
+    }
 
     }
 
