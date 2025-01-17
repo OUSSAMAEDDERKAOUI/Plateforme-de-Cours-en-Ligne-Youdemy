@@ -19,7 +19,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $Category->deleteCategory($categoryId);
         header('Location: ' . $_SERVER['PHP_SELF']);
     }
-    
+    if (isset($_POST['update'])) {
+        $categoryId = htmlspecialchars($_GET['id']);
+        $Category = new Category("", "", "", "");
+
+        $res=$Category->getCategoryById($categoryId);
+
+    }
+   
+
+    }
+
+
+
 
 $formClass = '';
 
