@@ -25,6 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: ' . $_SERVER['PHP_SELF']);
         exit;
     }
+
+
+
+
     if (isset($_POST['modifyCourse'])) {
         $courseId = $_POST['courseId']; // Récupérer l'ID du cours à modifier
         $title = htmlspecialchars($_POST['title']);
@@ -62,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 function getCategoryName($categoryId)
 {
     // Connexion à la base de données
-   
+
 }
 
 $courses = Course::showCourses();
@@ -84,6 +88,8 @@ $courses = Course::showCourses();
     <title>Youdemy - Dashboard Enseignant</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -167,7 +173,7 @@ $courses = Course::showCourses();
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Description
                                         </th>
-                                       
+
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Statut
                                         </th>
@@ -186,26 +192,28 @@ $courses = Course::showCourses();
                                                 <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($course->getCourseTitle()); ?></div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm text-gray-900"><?php     echo " $categoryTitle " ?></div> 
+                                                <div class="text-sm text-gray-900"><?php echo " $categoryTitle " ?></div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm text-gray-500"><?php echo htmlspecialchars($course->getCoursesDescription()); ?></div>
                                             </td>
-                                           
-                                           
+
+
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                    <?php echo ($course->getCourseStatus() === 'Publié') ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'; ?>">
+                                                    <?php echo ($course->getCourseStatus() === 'accepté') ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'; ?>">
                                                     <?php echo htmlspecialchars($course->getCourseStatus()); ?>
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <button onclick="editCourse(<?php echo $course->getCourseId(); ?>)" class="text-indigo-600 hover:text-indigo-900 mr-3">
-                                                    Modifier
-                                                </button>
-                                                <button onclick="deleteCourse(<?php echo $course->getCourseId(); ?>)" class="text-red-600 hover:text-red-900">
-                                                    Supprimer
-                                                </button>
+                                            <?php echo '<form method="POST" action="?id='.htmlspecialchars($course->getTeacherId()).' ">';?>
+                                                    <button id="modifycourse" onclick="" class="text-indigo-600 hover:text-indigo-900 mr-6" name="modifycourse">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="text-red-600 hover:text-red-900" name="deletecourse">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -375,12 +383,18 @@ $courses = Course::showCourses();
             </form>
         </div>
     </div>
-                    </main>
+    </main>
 
-                    <script>
-                        document.getElementById('openNewCourse').addEventListener('click',function(){
-                            document.getElementById('newCourseModal').classList.remove('hidden');
-                        })
+    <script>
+        function showAddTagModal() {
+        document.getElementById('newCourseModal').classList.remove('hidden');
+        document.getElementById('newCourseModal').classList.add('flex');
+        // document.getElementById('modifyTag').classList.remove('flex');
+        document.getElementById('modifyCourseModal').classList.add('hidden');
+    }
+        document.getElementById('openNewCourse').addEventListener('click', function() {
+            document.getElementById('newCourseModal').classList.remove('hidden');
+        })
         // Ouvrir le modal de nouveau cours
         function openNewCourse() {
             document.getElementById('newCourseModal').classList.remove('hidden');
