@@ -27,6 +27,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
 
+    if (isset($_POST['deletecourse'])) {
+        $courseId = htmlspecialchars($_GET['id']);
+        echo $_GET['id'];
+
+        course::deletecourse($courseId);
+        // header('Location: ' . $_SERVER['PHP_SELF']);
+    }
 
 
     if (isset($_POST['modifyCourse'])) {
