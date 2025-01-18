@@ -233,7 +233,17 @@ class Course
         return $teacher ? $teacher['teacher_name'] : 'Inconnu'; // Retourne le nom de l'enseignant ou 'Inconnu' si non trouvé
     }
 
-   
+    public static function deletecourse($course_id)
+    {
+        $stmt = Database::getInstance()->getConnection()->prepare("UPDATE `courses` SET `course_status`='refusé'  WHERE `course_id`=:course_id");
+        $stmt->bindParam(':course_id', $course_id, PDO::PARAM_INT);
+
+        try {
+            $stmt->execute();
+        } catch (PDOException $e) {
+            throw new PDOException($e->getMessage(), (int) $e->getCode());
+        }
+    }
 
 
 
