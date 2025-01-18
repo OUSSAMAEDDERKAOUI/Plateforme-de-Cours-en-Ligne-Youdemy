@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
 
-class Course
+abstract class Course
 {
     protected $courseId;
     protected $courseTitle;
@@ -9,22 +9,28 @@ class Course
     protected $creationDate;
     protected $courseStatus;
     protected $courseConverture;
-    protected $courses_description;
+    protected $courseDescription;
     protected $teacherId;
     protected $categoryId;
+    protected $courseType;
 
 
-    public function __construct( $courseId ,$courseTitle, $courseContent, $teacherId, $courseStatus = 'active', $creationDate = null, $courseConverture, $courses_description, $categoryId = null)
+
+    public function __construct( $courseId ,$courseTitle, $courseContent, $teacherId, $courseStatus = null, $creationDate = null, $courseConverture, $courseDescription, $categoryId = null,$courseType)
     {
         $this->courseId = $courseId;
         $this->courseTitle = $courseTitle;
         $this->courseContent = $courseContent;
         $this->teacherId = $teacherId;
-        $this->courseStatus = $courseStatus;
+        $this->courseStatus = $courseStatus ?:'accepté';
         $this->creationDate = $creationDate ?: date('Y-m-d');
         $this->courseConverture = $courseConverture;
-        $this->courses_description = $courses_description;
+        $this->courseDescription = $courseDescription;
         $this->categoryId = $categoryId;
+        $this->courseType = $courseType;
+
+
+
     }
 
     // ------------------- Getters -------------------------
@@ -66,13 +72,18 @@ class Course
 
     public function getCoursesDescription()
     {
-        return $this->courses_description;
+        return $this->courseDescription;
     }
 
     public function getCategoryId()
     {
         return $this->categoryId;
     }
+    public function getCourseType()
+    {
+        return $this->courseType;
+    }
+    
 
     // ------------------- Setters -------------------------
 
@@ -111,100 +122,55 @@ class Course
         $this->courseConverture = $courseConverture;
     }
 
-    public function setCoursesDescription($courses_description)
+    public function setCoursesDescription($courseDescription)
     {
-        $this->courses_description = $courses_description;
+        $this->courseDescription = $courseDescription;
     }
 
     public function setCategoryId($categoryId)
     {
         $this->categoryId = $categoryId;
     }
+    public function setCourseType($courseType)
+    {
+        $this->courseType = $courseType;
+    }
 
 
     // ------------------- Méthodes supplémentaires -------------------------
+    abstract public function uploadFile();
+
+    // Insertion du cours dans la base de données
     public function addCourse()
     {
-        if (isset($_FILES['course_image']) && $_FILES['course_image']['error'] === UPLOAD_ERR_OK) {
-            $courseConverture = $_FILES['course_image'];
-            $permited = array('jpg', 'png', 'jpeg', 'gif');
-            $file_name = $courseConverture['name'];
-            $file_size = $courseConverture['size'];
-            $file_temp = $courseConverture['tmp_name'];
-            $div = explode('.', $file_name);
-            $file_ext = strtolower(end($div));
+        // Upload du fichier spécifique à chaque sous-classe
+        $this->uploadFile();
 
-            if (in_array($file_ext, $permited) === false) {
-                throw new Exception("Format d'image non autorisé. Autorisé : " . implode(', ', $permited));
-            }
-
-            $unique_image = substr(md5(time()), 0, 10) . '.' . $file_ext;
-
-            $uploadDir = "storage/uploads/";
-            $this->courseConverture = $uploadDir . $unique_image;
-
-            if (!move_uploaded_file($file_temp, __DIR__ . "/../../" . $this->courseConverture)) {
-                throw new Exception("Échec du téléchargement de l'image.");
-            }
-        } else {
-            throw new Exception("Aucune image à télécharger ou une erreur est survenue.");
-        }
-
-
-
-
-        $stmt = 'INSERT INTO `courses`(`course_title`, `course_content`,`teacher_id`, `couverture`, `courses_description`, `course_cat_id`) VALUES (:course_title,:course_content,:teacher_id,:couverture,:courses_description,:course_cat_id)';
-        $stmt = Database::getInstance()->getConnection()->prepare($stmt);
-        $stmt->bindParam(':course_title', $this->courseTitle, PDO::PARAM_STR);
-        $stmt->bindParam(':course_content', $this->courseContent, PDO::PARAM_STR);
-        $stmt->bindParam(':teacher_id', $this->teacherId, PDO::PARAM_INT);
-        $stmt->bindParam(':couverture', $this->courseConverture, PDO::PARAM_STR);
-        $stmt->bindParam(':courses_description', $this->courses_description, PDO::PARAM_STR);
-        $stmt->bindParam(':course_cat_id', $this->categoryId, PDO::PARAM_INT);
-
-
-
-
-        try {
-            $stmt->execute();
-        } catch (PDOException $e) {
-            throw new PDOException($e->getMessage(), (int) $e->getCode());
-        }
-    }
-
-    public static function showCourses()
-    {
+        // Insertion dans la base de données
         $pdo = Database::getInstance()->getConnection();
-        $query = "SELECT `course_id`, `course_title`, `course_content`, `creation_date`, `course_status`, `teacher_id`, `couverture`, `courses_description`, `course_cat_id`
-        FROM `courses` WHERE course_status ='accepté' ";
-
+        $query = "INSERT INTO courses (`course_title`, `course_content`, `teacher_id`, `couverture`, `courses_description`, `course_cat_id`, `course_type`) 
+                  VALUES (:courseTitle, :courseContent, :teacherId, :courseCover, :coursesDescription, :categoryId, :courseType)";
+        
         $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':courseTitle', $this->courseTitle);
+        $stmt->bindParam(':courseContent', $this->courseContent);
+        $stmt->bindParam(':teacherId', $this->teacherId);
+        $stmt->bindParam(':courseCover', $this->courseConverture);
+        $stmt->bindParam(':coursesDescription', $this->courseDescription);
+        $stmt->bindParam(':categoryId', $this->categoryId);
+        $stmt->bindParam(':courseType', $this->courseType);
 
-        try {
-            $stmt->execute();
-            $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            throw new PDOException($e->getMessage(), (int) $e->getCode());
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            throw new Exception("Erreur lors de l'ajout du cours dans la base de données.");
         }
-
-        $courseObjects = [];
-        foreach ($courses as $course) {
-            $courseObjects[] = new self(
-                $course['course_id'],
-                $course['course_title'],
-                $course['course_content'],
-                $course['teacher_id'],
-                $course['course_status'],
-                $course['creation_date'],
-                $course['couverture'],
-                $course['courses_description'],
-                $course['course_cat_id'],
-
-            );
-        }
-
-        return $courseObjects;
     }
+
+
+
+    abstract public static function showCourses();
+
 
 
     public static function getCategoryTitleById($categoryId)
