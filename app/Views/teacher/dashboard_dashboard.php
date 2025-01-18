@@ -16,32 +16,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $courseTags = isset($_POST['courseTags']) ? $_POST['courseTags'] : [];
         $teacherId = 1; // Définir l'ID de l'enseignant, ici il est fixé à '1' pour l'exemple.
 
-        
+
         $upload_img = $_FILES['course_image'];
-        
+
         $upload_file = $_FILES['course_file'];
 
         if ($course_type === 'document') {
-            $course = new CourseDocument(null, $title, $upload_file, $teacherId,null, null, $upload_img, $description, $categoryId,$course_type);
+            $course = new CourseDocument(null, $title, $upload_file, $teacherId, null, null, $upload_img, $description, $categoryId, $course_type);
         } else if ($course_type === 'video') {
-            $course = new CourseVideo(null, $title, $upload_file, $teacherId,null, null, $upload_img, $description, $categoryId,$course_type);
+            $course = new CourseVideo(null, $title, $upload_file, $teacherId, null, null, $upload_img, $description, $categoryId, $course_type);
         }
 
         try {
             $course->addCourse();
-            header('Location: ' . $_SERVER['PHP_SELF']); 
+            header('Location: ' . $_SERVER['PHP_SELF']);
             exit;
         } catch (Exception $e) {
-            
+
             echo "Erreur : " . $e->getMessage();
         }
     }
 
-
-
-
-    
-
+    if (isset($_POST['deletecourse'])) {
+        $coursId = $_GET['id'];
+        $deleteCourse = Course::deletecourse($coursId);
+    }
 
     if (isset($_POST['modifyCourse'])) {
         $courseId = $_POST['courseId']; // Récupérer l'ID du cours à modifier
@@ -77,17 +76,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
-function getCategoryName($categoryId)
-{
-    // Connexion à la base de données
 
-}
 
 $coursesDocument = CourseDocument::showCourses();
 $coursesVideo = CourseVideo::showCourses();
 
 
+$formClass = '';
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || isset($_POST['deletecourse'])) {
+    $formClass = 'hidden';
+}
 ?>
 
 
@@ -223,13 +222,13 @@ $coursesVideo = CourseVideo::showCourses();
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <?php echo '<form method="POST" action="?id='.htmlspecialchars($courseDocument->getTeacherId()).' ">';?>
-                                                    <button id="modifycourse" onclick="showmodifyModal()" class="text-indigo-600 hover:text-indigo-900 mr-6" name="modifycourse">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button class="text-red-600 hover:text-red-900" name="deletecourse">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
+                                                <?php echo '<form method="POST" action="?id=' . htmlspecialchars($courseDocument->getcourseId()) . ' ">'; ?>
+                                                <button id="modifycourse" onclick="showmodifyModal()" class="text-indigo-600 hover:text-indigo-900 mr-6" name="modifycourse">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="text-red-600 hover:text-red-900" name="deletecourse">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
                                                 </form>
                                             </td>
                                         </tr>
@@ -239,63 +238,63 @@ $coursesVideo = CourseVideo::showCourses();
                             <h3 class="text-xl font-semibold mb-4">Mes cours De Type Vidéo</h3>
                             <table class="min-w-full">
 
-<thead>
-    <tr class="bg-gray-50">
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Titre
-        </th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Categorie
-        </th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Description
-        </th>
+                                <thead>
+                                    <tr class="bg-gray-50">
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Titre
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Categorie
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Description
+                                        </th>
 
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Statut
-        </th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Actions
-        </th>
-    </tr>
-</thead>
-<tbody id="coursesList" class="bg-white divide-y divide-gray-200">
-    <?php foreach ($coursesVideo as $courseVideo) : ?>
-        <?php $categoryTitle = Course::getCategoryTitleById($courseVideo->getCategoryId()); ?>
-        <!-- $teacherName = Course::getTeacherNameById($course->getTeacherId()); // Récupérer le nom de l'enseignant -->
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Statut
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="coursesList" class="bg-white divide-y divide-gray-200">
+                                    <?php foreach ($coursesVideo as $courseVideo) : ?>
+                                        <?php $categoryTitle = Course::getCategoryTitleById($courseVideo->getCategoryId()); ?>
+                                        <!-- $teacherName = Course::getTeacherNameById($course->getTeacherId()); // Récupérer le nom de l'enseignant -->
 
-        <tr>
-            <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($courseVideo->getCourseTitle()); ?></div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900"><?php echo " $categoryTitle " ?></div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-500"><?php echo htmlspecialchars($courseVideo->getCoursesDescription()); ?></div>
-            </td>
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($courseVideo->getCourseTitle()); ?></div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm text-gray-900"><?php echo " $categoryTitle " ?></div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm text-gray-500"><?php echo htmlspecialchars($courseVideo->getCoursesDescription()); ?></div>
+                                            </td>
 
 
-            <td class="px-6 py-4 whitespace-nowrap">
-                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                     <?php echo ($courseVideo->getCourseStatus() === 'accepté') ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'; ?>">
-                    <?php echo htmlspecialchars($courseVideo->getCourseStatus()); ?>
-                </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-            <?php echo '<form method="POST" action="?id='.htmlspecialchars($courseVideo->getTeacherId()).' ">';?>
-                    <button id="modifycourse" onclick="showmodifyModal()" class="text-indigo-600 hover:text-indigo-900 mr-6" name="modifycourse">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="text-red-600 hover:text-red-900" name="deletecourse">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </form>
-            </td>
-        </tr>
-    <?php endforeach; ?>
-</tbody>
-</table>
+                                                    <?php echo htmlspecialchars($courseVideo->getCourseStatus()); ?>
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <?php echo '<form method="POST" action="?id=' . htmlspecialchars($courseVideo->getcourseId()) . ' ">'; ?>
+                                                <button id="modifycourse" onclick="showmodifyModal()" class="text-indigo-600 hover:text-indigo-900 mr-6" name="modifycourse">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="text-red-600 hover:text-red-900" name="deletecourse">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -353,20 +352,20 @@ $coursesVideo = CourseVideo::showCourses();
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Type de Contenu</label>
-                
-                   <select name="course_type" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+
+                    <select name="course_type" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
                         <option value="document"> document</option>
                         <option value="video"> vidéo </option>
-                   </select>
-                
+                    </select>
+
                 </div>
 
                 <!-- Image du cours (Couverture) -->
-               
+
                 <div>
-    <label class="block text-sm font-medium text-gray-700">Télécharger un document PDF</label>
-    <input type="file" name="course_file" accept="application/pdf/mp4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
-</div>
+                    <label class="block text-sm font-medium text-gray-700">Télécharger un document PDF</label>
+                    <input type="file" name="course_file" accept="application/pdf/mp4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
 
                 <!-- Boutons -->
                 <div class="flex justify-end space-x-3 mt-6">
@@ -384,27 +383,106 @@ $coursesVideo = CourseVideo::showCourses();
 
 
 
-    
+
+
+
+    <div id="modifyCourseModal" class=" fixed  inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 <?php echo $formClass; ?> ">
+        <div class="bg-white rounded-lg p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-6">Ajouter un nouveau cours</h2>
+            <form id="newCourseForm" class="space-y-4" method="POST" enctype="multipart/form-data">
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Titre du cours</label>
+                    <input type="text" name="title" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Image de couverture</label>
+                    <input type="file" name="course_image" accept="image/*" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea name="description" rows="4" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Catégorie</label>
+                    <?php
+                    require_once '../../Models/Category.php';
+                    $categories = new Category("", "", "", "", "");
+                    $rows = $categories->showCategory();
+                    echo '<select name="category" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">';
+                    foreach ($rows as $row) {
+                        echo '<option value="' . $row['category_id'] . '">' . $row['category_title'] . '</option>';
+                    }
+                    echo '</select>';
+                    ?>
+                </div>
+
+                <label class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+                <?php
+                require_once '../../Models/Tags.php';
+                $tags = new Tags("", "", "", "");
+                $results = $tags->showTags();
+                echo '<div class="flex flex-wrap">';
+                foreach ($results as $result) {
+                    echo '<div class="w-1/4 p-2">';
+                    echo '<input type="checkbox" name="courseTags[]" value="' . $result['tag_id'] . '" id="tag_' . $result['tag_id'] . '">';
+                    echo '<label for="tag_' . $result['tag_id'] . '">' . $result['tag_name'] . '</label>';
+                    echo '</div>';
+                }
+                echo '</div>';
+                ?>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Type de Contenu</label>
+
+                    <select name="course_type" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                        <option value="document"> document</option>
+                        <option value="video"> vidéo </option>
+                    </select>
+
+                </div>
+
+                <!-- Image du cours (Couverture) -->
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Télécharger un document PDF</label>
+                    <input type="file" name="course_file" accept="application/pdf/mp4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+
+                <!-- Boutons -->
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" onclick="closeNewCourseModal()" class="px-4 py-2 border rounded-md hover:bg-gray-100">
+                        Annuler
+                    </button>
+                    <button type="submit" name="addCourse" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        Créer le cours
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+
+
+
     </div>
     </main>
 
     <script>
-        function showmodifyModal() {
-        // document.getElementById('newCourseModal').classList.remove('hidden');
-        // document.getElementById('newCourseModal').classList.add('flex');
-        document.getElementById('modifyCourseModal').classList.remove('hidden');
-    }
-        document.getElementById('openNewCourse').addEventListener('click', function() {
-            document.getElementById('newCourseModal').classList.remove('hidden');
-        })
-        // Ouvrir le modal de nouveau cours
         function openNewCourse() {
             document.getElementById('newCourseModal').classList.remove('hidden');
+            document.getElementById('modifyCourseModal').classList.remove('hidden');
+
         }
 
-        // Fermer le modal de nouveau cours
         function closeNewCourseModal() {
             document.getElementById('newCourseModal').classList.add('hidden');
+            document.getElementById('modifyCourseModal').classList.add('hidden');
+
+
         }
     </script>
 </body>

@@ -82,9 +82,33 @@ class CourseVideo extends Course
         return $courseObjects;
     }
 
+    public static function getCourseById($courseId) {
+        $pdo = Database::getInstance()->getConnection();
+        $query = "SELECT * FROM courses WHERE course_id = :courseId AND course_type = 'video'";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':courseId', $courseId, PDO::PARAM_INT);
+        $stmt->execute();
+        $course = $stmt->fetch(PDO::FETCH_ASSOC);
 
-
+        if ($course) {
+            return new CourseVideo(
+                $course['course_id'],
+                $course['course_title'],
+                $course['course_content'],
+                $course['teacher_id'],
+                $course['course_status'],
+                $course['creation_date'],
+                $course['couverture'],
+                $course['courses_description'],
+                $course['course_cat_id'],
+                $course['course_type']
+            );
+        }
+        return null;
+    }
 }
+
+
 
 ?>
 

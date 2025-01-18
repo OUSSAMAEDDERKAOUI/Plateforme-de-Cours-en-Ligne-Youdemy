@@ -211,7 +211,9 @@ abstract class Course
         }
     }
 
-
+    public static function getCourseById($courseId) {
+       
+    }
 
 
 

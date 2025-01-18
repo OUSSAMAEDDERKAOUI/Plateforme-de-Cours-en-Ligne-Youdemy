@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '../../../Models/Course.php';
+require_once __DIR__ . './Course.php';
 
 class CourseDocument extends Course
 {
@@ -59,7 +59,7 @@ class CourseDocument extends Course
 
         try {
             $stmt->execute();
-            
+
             $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             throw new PDOException($e->getMessage(), (int) $e->getCode());
@@ -80,11 +80,36 @@ class CourseDocument extends Course
                 $course['course_type']
             );
         }
+        var_dump($courseObjects);
 
         return $courseObjects;
     }
 
+    public static function getCourseById($courseId) {
+        $pdo = Database::getInstance()->getConnection();
+        $query = "SELECT * FROM courses WHERE course_id = :courseId AND course_type = 'document'";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':courseId', $courseId, PDO::PARAM_INT);
+        $stmt->execute();
+        $course = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        if ($course) {
+
+            return new CourseDocument(
+                $course['course_id'],
+                $course['course_title'],
+                $course['course_content'],
+                $course['teacher_id'],
+                $course['course_status'],
+                $course['creation_date'],
+                $course['couverture'],
+                $course['courses_description'],
+                $course['course_cat_id'],
+                $course['course_type']
+            );
+        }
+        return null;
+    }
 
 }
 
