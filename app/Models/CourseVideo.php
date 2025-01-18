@@ -27,7 +27,28 @@ class CourseVideo extends Course
             throw new Exception("Aucune image téléchargée.");
         }
 
-      
+        // Upload du fichier vidéo
+        if (isset($_FILES['course_file']) && $_FILES['course_file']['error'] === UPLOAD_ERR_OK) {
+            $courseVideo = $_FILES['course_file'];
+            $file_ext_video = strtolower(pathinfo($courseVideo['name'], PATHINFO_EXTENSION));
+            $allowed_ext_video = ['mp4', 'avi', 'mov', 'mkv'];
+
+            if (!in_array($file_ext_video, $allowed_ext_video)) {
+                throw new Exception("Format de fichier vidéo non autorisé.");
+            }
+
+            $unique_video = substr(md5(time()), 0, 10) . '.' . $file_ext_video;
+            $uploadVideoDir = "storage/uploads/";
+            $this->courseContent = $uploadVideoDir . $unique_video;
+
+            if (!move_uploaded_file($courseVideo['tmp_name'], __DIR__ . "/../../" . $this->courseContent)) {
+                throw new Exception("Échec du téléchargement de la vidéo.");
+            }
+        } else {
+            throw new Exception("Aucune vidéo téléchargée.");
+        }
+    }
+
 
 
 
