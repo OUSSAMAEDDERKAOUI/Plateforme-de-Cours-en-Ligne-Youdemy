@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . './Course.php';
+require_once __DIR__ . '../../../Models/Course.php';
 
 class CourseDocument extends Course
 {
@@ -56,8 +56,10 @@ class CourseDocument extends Course
 
         $stmt = $pdo->prepare($query);
 
+
         try {
             $stmt->execute();
+            
             $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             throw new PDOException($e->getMessage(), (int) $e->getCode());
