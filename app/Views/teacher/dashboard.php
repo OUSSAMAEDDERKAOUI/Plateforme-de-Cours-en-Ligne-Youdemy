@@ -60,7 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_GET['id'])) {
         $courseId = $_GET['id'];
     
-        $course = Course::getCourseById($courseId); 
         if ($course) {
             $courseTitle = $course->getCourseTitle();
             $courseDescription = $course->getCoursesDescription();         
@@ -105,6 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
    
 }
+$course = Course::getCourseById($courseId); 
 
 
 $coursesDocument = CourseDocument::showCourses();

@@ -140,13 +140,10 @@ abstract class Course
     // ------------------- Méthodes supplémentaires -------------------------
     abstract public function uploadFile();
 
-    // Insertion du cours dans la base de données
     public function addCourse()
     {
-        // Upload du fichier spécifique à chaque sous-classe
         $this->uploadFile();
 
-        // Insertion dans la base de données
         $pdo = Database::getInstance()->getConnection();
         $query = "INSERT INTO courses (`course_title`, `course_content`, `teacher_id`, `couverture`, `courses_description`, `course_cat_id`, `course_type`) 
                   VALUES (:courseTitle, :courseContent, :teacherId, :courseCover, :coursesDescription, :categoryId, :courseType)";
@@ -169,10 +166,8 @@ abstract class Course
 
     public function updateCourse()
     {
-        // Upload du fichier spécifique à chaque sous-classe
         $this->uploadFile();
 
-        // Insertion dans la base de données
         $pdo = Database::getInstance()->getConnection();
         $query ="UPDATE `courses` SET `course_title`=:course_title,`course_content`=:course_content,`couverture`=:courseCover,
         `courses_description`=:courses_description,`course_cat_id`=:course_cat_id,`course_type`=:course_type 
@@ -204,28 +199,27 @@ abstract class Course
 
     public static function getCategoryTitleById($categoryId)
     {
-        $pdo = Database::getInstance()->getConnection(); // Connexion à la base de données
-        $query = "SELECT category_title FROM categories WHERE category_id = :categoryId"; // Requête pour récupérer le titre de la catégorie
+        $pdo = Database::getInstance()->getConnection(); 
+        $query = "SELECT category_title FROM categories WHERE category_id = :categoryId"; 
         $stmt = $pdo->prepare($query);
         $stmt->bindParam(':categoryId', $categoryId, PDO::PARAM_INT);
         $stmt->execute();
         $category = $stmt->fetch(PDO::FETCH_ASSOC);
 
         return $category ? $category['category_title'] : 'Inconnu';
-        // Retourner le titre de la catégorie ou 'Inconnu' si non trouvé
     }
 
 
     public static function getTeacherNameById($teacherId)
     {
-        $pdo = Database::getInstance()->getConnection(); // Connexion à la base de données
+        $pdo = Database::getInstance()->getConnection(); 
         $query = "SELECT teacher_name FROM teachers WHERE teacher_id = :teacherId";
         $stmt = $pdo->prepare($query);
         $stmt->bindParam(':teacherId', $teacherId, PDO::PARAM_INT);
         $stmt->execute();
         $teacher = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $teacher ? $teacher['teacher_name'] : 'Inconnu'; // Retourne le nom de l'enseignant ou 'Inconnu' si non trouvé
+        return $teacher ? $teacher['teacher_name'] : 'Inconnu';
     }
 
     public static function deletecourse($course_id)
@@ -255,7 +249,6 @@ abstract class Course
         $course = $stmt->fetch(PDO::FETCH_ASSOC);
     
         if ($course) {
-            // Création d'un objet en fonction du type de cours
              if ($course['course_type'] === 'vidéo') {
                 return new CourseVideo(
                     $course['course_id'],
@@ -285,19 +278,22 @@ abstract class Course
             }
         }
     
-        return null;  // Si aucun cours trouvé, retourner null
+        return null;  
     }
+    
+
     
 
 
 
-    //  récupérer la liste des étudiants inscrits à ce cours
+
+
+
     public function getEnrolledStudents()
     {
         return [];
     }
 
-    //  changer le statut du cours (activer/désactiver)
     public function changeStatus($newStatus)
     {
         $this->courseStatus = $newStatus;
