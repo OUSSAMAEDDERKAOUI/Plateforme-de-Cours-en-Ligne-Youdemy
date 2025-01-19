@@ -167,7 +167,36 @@ abstract class Course
         }
     }
 
+    public function updateCourse()
+    {
+        // Upload du fichier spécifique à chaque sous-classe
+        $this->uploadFile();
 
+        // Insertion dans la base de données
+        $pdo = Database::getInstance()->getConnection();
+        $query ="UPDATE `courses` SET `course_title`=:course_title,`course_content`=:course_content,`couverture`=:courseCover,
+        `courses_description`=:courses_description,`course_cat_id`=:course_cat_id,`course_type`=:course_type 
+        WHERE `course_id`=:course_id";
+
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':course_title', $this->courseTitle);
+        $stmt->bindParam(':course_content', $this->courseContent);
+        $stmt->bindParam(':courseCover', $this->courseConverture);
+        $stmt->bindParam(':courses_description', $this->courseDescription);
+        $stmt->bindParam(':course_cat_id', $this->categoryId);
+        $stmt->bindParam(':course_type', $this->courseType);
+        $stmt->bindParam(':course_id', $this->courseId);
+        echo('test valid 2');
+
+
+        if ($stmt->execute()) {
+            echo('test valid 1');
+
+            return true;
+        } else {
+            throw new Exception("Erreur lors de l'ajout du cours dans la base de données.");
+        }
+    }
 
     abstract public static function showCourses();
 
@@ -212,8 +241,53 @@ abstract class Course
     }
 
     public static function getCourseById($courseId) {
-       
+        $pdo = Database::getInstance()->getConnection();
+        $query = "SELECT * FROM courses WHERE course_id = :courseId";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':courseId', $courseId, PDO::PARAM_INT);
+    
+        try {
+            $stmt->execute();
+        } catch (PDOException $e) {
+            throw new PDOException($e->getMessage(), (int) $e->getCode());
+        }
+    
+        $course = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        if ($course) {
+            // Création d'un objet en fonction du type de cours
+             if ($course['course_type'] === 'vidéo') {
+                return new CourseVideo(
+                    $course['course_id'],
+                    $course['course_title'],
+                    $course['course_content'],
+                    $course['teacher_id'],
+                    $course['course_status'],
+                    $course['creation_date'],
+                    $course['couverture'],
+                    $course['courses_description'],
+                    $course['course_cat_id'],
+                    $course['course_type']
+                );
+            }else if ($course['course_type'] === 'document') {
+                return new CourseDocument(
+                    $course['course_id'],
+                    $course['course_title'],
+                    $course['course_content'],
+                    $course['teacher_id'],
+                    $course['course_status'],
+                    $course['creation_date'],
+                    $course['couverture'],
+                    $course['courses_description'],
+                    $course['course_cat_id'],
+                    $course['course_type']
+                );
+            }
+        }
+    
+        return null;  // Si aucun cours trouvé, retourner null
     }
+    
 
 
 

@@ -1,3 +1,12 @@
+<?php
+session_start();
+echo $_SESSION['user_role'];
+
+
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>

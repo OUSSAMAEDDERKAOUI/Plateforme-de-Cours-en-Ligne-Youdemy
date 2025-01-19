@@ -21,7 +21,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
 
             if ($loggedInUser) {
                 
-                echo'5';
+                session_start();
 
                 $_SESSION['user_id'] = $loggedInUser->getidUser();
                 $_SESSION['user_prenom'] = $loggedInUser->getfName();
@@ -29,8 +29,31 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
                 $_SESSION['user_email'] = $loggedInUser->getEmail();
                 $_SESSION['user_role'] = $loggedInUser->getRole();
 
-echo  $_SESSION['user_role'];
-                header('Location: ../course/index.php');
+                if (isset($_SESSION['user_role'])) {
+                    // Rediriger selon le rôle de l'utilisateur
+                    switch ($_SESSION['user_role']) {
+                        case 'admin':
+                            header('Location: ../admin/dashboard_tags.php');
+                            break;
+                        case 'etudiant':
+                            header('Location: ../etudiant/dashboard.php');
+                            break;
+                        case 'enseignant':
+                            header('Location: ../teacher/dashboard.php');
+                            break;
+                        default:
+                            // Rediriger vers la page d'accueil par défaut
+                            header('Location: ../visiteur/visiteur.php');
+                            break;
+                    }
+                    exit;
+                } else {
+                    // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
+                    header('Location: ../visiteur/visiteur.php');
+                    exit;
+                }
+                
+                // header('Location: __DIR__ . ../ " . $_SESSION['user_role'] . ".php;');
 
 
 

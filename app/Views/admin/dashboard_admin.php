@@ -1,3 +1,23 @@
+<?php
+session_start();
+if (isset($_SESSION['user_role'])) {
+    switch ($_SESSION['user_role']) {
+        case 'admin':
+            header('Location: ../admin/dashboard_tags.php');
+            break;
+       
+        default:
+            header('Location: ../user/login.php');
+            break;
+    }
+    exit;
+} else {
+    header('Location: ../visiteur/visiteur.php');
+    exit;
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
