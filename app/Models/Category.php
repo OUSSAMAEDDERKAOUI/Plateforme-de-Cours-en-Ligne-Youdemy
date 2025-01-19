@@ -9,7 +9,8 @@ class Category {
     protected $categoryStatus; 
     protected $categoryConverture   ;    
 
-    public function __construct( $categoryTitle, $categoryDescription, $creationDate = null, $categoryStatus = null,$categoryConverture) {
+    public function __construct( $categoryId,$categoryTitle, $categoryDescription, $creationDate = null, $categoryStatus = null,$categoryConverture) {
+        $this->categoryId = $categoryId;
         $this->categoryTitle = $categoryTitle;
         $this->categoryDescription = $categoryDescription;
         $this->creationDate = $creationDate ?? date('Y-m-d'); 
@@ -141,7 +142,42 @@ public function showCategory() {
         return null;
     }
 }
+public static function showVisiteurCategory() {
+    $stmt = Database::getInstance()->getConnection()->prepare(" SELECT * FROM categories
+        
+        WHERE categories.category_status = 'actif'" );
 
+    try {
+        $stmt->execute();
+
+        $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!empty($categories)) {
+            $categoriesarray=[];
+            foreach($categories as $Category){
+                $categoriesarray[]=new self(
+                    $Category['category_id'],
+                    $Category['category_title'],
+                    $Category['category_description'],
+                    $Category['creation_date'],
+                    $Category['category_status'],
+                    $Category['categoryCouverture']
+                );
+            }
+           
+            return $categoriesarray;
+        } else {
+            throw new Exception("Aucune catégorie trouvée.");
+        }
+
+    } catch (PDOException $e) {
+        echo "Erreur de base de données : " . $e->getMessage();
+        return null;
+    } catch (Exception $e) {
+        echo "Erreur : " . $e->getMessage();
+        return null;
+    }
+}
 
 public function updateCategory() {
     if (empty($this->categoryTitle) || empty($this->categoryDescription) || empty($this->categoryId)) {

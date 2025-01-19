@@ -1,20 +1,20 @@
 <?php
-session_start();
-if (isset($_SESSION['user_role'])) {
-    switch ($_SESSION['user_role']) {
-        case 'admin':
-            header('Location: ../admin/dashboard_tags.php');
-            break;
+// session_start();
+// if (isset($_SESSION['user_role'])) {
+//     switch ($_SESSION['user_role']) {
+//         case 'admin':
+//             header('Location: ../admin/dashboard_tags.php');
+//             break;
        
-        default:
-            header('Location: ../user/login.php');
-            break;
-    }
-    exit;
-} else {
-    header('Location: ../visiteur/visiteur.php');
-    exit;
-}
+//         default:
+//             header('Location: ../user/login.php');
+//             break;
+//     }
+//     exit;
+// } else {
+//     header('Location: ../visiteur/visiteur.php');
+//     exit;
+// }
 require_once __DIR__ . '../../../Models/Category.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $description = htmlspecialchars($_POST['description']);
         $upload_img = $_FILES['category_image'];
 
-        $Category = new Category($titre, $description, null, null,$upload_img);
+        $Category = new Category(null,$titre, $description, null, null,$upload_img);
 
         $Category->addCategory();
         header('Location: ' . $_SERVER['PHP_SELF']);
@@ -33,14 +33,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['delete'])) {
         $categoryId = htmlspecialchars($_GET['id']);
         echo $_GET['id'];
-        $Category = new Category("", "", "", "","");
+        $Category = new Category("","", "", "", "","");
 
         $Category->deleteCategory($categoryId);
         header('Location: ' . $_SERVER['PHP_SELF']);
     }
     if (isset($_POST['update'])) {
         $categoryId = htmlspecialchars($_GET['id']);
-        $Category = new Category("", "", "", "","");
+        $Category = new Category("","", "", "", "","");
 
         $resu=$Category->getCategoryById($categoryId);
 
@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $upload_cvr = $_FILES['update_image'];
 
         echo $description;
-        $Category = new Category($titre, $description, null, null,$upload_cvr);
+        $Category = new Category(null,$titre, $description, null, null,$upload_cvr);
 
         $Category->setCategoryId($categoryId);
         
@@ -256,7 +256,7 @@ if ($_SERVER['REQUEST_METHOD']!=='POST' || isset($_POST['delete'])) {
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="categoriesList">
                             <?php
-                            $Category = new Category("", "", "", "", "");
+                            $Category = new Category("","", "", "", "", "");
                             $rows = $Category->showCategory();
                             foreach ($rows as $row) {
                                 echo ' <div class="bg-white p-4 rounded-lg shadow border">

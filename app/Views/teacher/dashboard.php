@@ -16,18 +16,8 @@ if (isset($_POST['dec'])) {
 }
 
 session_start();
-if (isset($_SESSION['user_role'])) {
-    switch ($_SESSION['user_role']) {
-        case 'enseignant':
-            header('Location: ../teacher/dashboard.php');
-            break;
 
-        default:
-            header('Location: ../user/login.php');
-            break;
-    }
-    exit;
-} else {
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'enseignant') {
     header('Location: ../visiteur/visiteur.php');
     exit;
 }

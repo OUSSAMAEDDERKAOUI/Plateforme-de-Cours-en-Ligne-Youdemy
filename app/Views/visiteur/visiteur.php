@@ -1,14 +1,16 @@
 <?php
-session_start();
-echo $_SESSION['user_role'];
-
-
+// session_start();
+// echo $_SESSION['user_role'];
+require_once __DIR__ . '../../../Models/Category.php';
+$categories = Category::showVisiteurCategory();
+print_r($categories);
 
 ?>
 
 
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,6 +18,7 @@ echo $_SESSION['user_role'];
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
+
 <body class="bg-gray-50">
     <!-- Navigation -->
     <nav class="bg-white shadow-lg fixed w-full top-0 z-50">
@@ -36,10 +39,10 @@ echo $_SESSION['user_role'];
         <!-- Barre de recherche -->
         <div class="max-w-4xl mx-auto mb-8">
             <div class="flex gap-4">
-                <input type="text" id="searchInput" 
-                    class="w-full p-3 rounded-lg border focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400" 
+                <input type="text" id="searchInput"
+                    class="w-full p-3 rounded-lg border focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400"
                     placeholder="Rechercher un cours...">
-                <button id="searchButton" 
+                <button id="searchButton"
                     class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
                     Rechercher
                 </button>
@@ -60,11 +63,28 @@ echo $_SESSION['user_role'];
                 </select>
             </div>
         </div>
-
+     
         <!-- Liste des cours -->
         <div class="max-w-7xl mx-auto">
             <div id="coursesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Les cours seront injectés ici via JavaScript -->
+                <?php  foreach($categories AS $category) : ?>
+<?php $image=$category->getCategoryConverture() ;?>
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                    <img src="/<?php echo htmlspecialchars($category->getCategoryConverture()) ;?>" alt="photo de converture" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl text-indigo-600 mb-2"><?php echo htmlspecialchars($category->getCategoryTitle()) ;?></h3>
+                        <p class="text-gray-600 mb-4">crée le <?php echo htmlspecialchars($category->getCreationDate()) ;?></p>
+                        <p class="text-gray-500 text-sm mb-4"><?php echo htmlspecialchars($category->getCategoryDescription()) ;?></p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold text-indigo-600">Gratuit</span>
+                            <button onclick=""
+                                class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                                Détails
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach ;?>
             </div>
 
             <!-- Pagination -->
@@ -81,17 +101,17 @@ echo $_SESSION['user_role'];
             <form id="registerForm" class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Nom complet</label>
-                    <input type="text" name="fullName" required 
+                    <input type="text" name="fullName" required
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" name="email" required 
+                    <input type="email" name="email" required
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Mot de passe</label>
-                    <input type="password" name="password" required 
+                    <input type="password" name="password" required
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
                 </div>
                 <div>
@@ -102,11 +122,11 @@ echo $_SESSION['user_role'];
                     </select>
                 </div>
                 <div class="flex justify-end space-x-3 mt-6">
-                    <button type="button" id="closeRegisterModal" 
+                    <button type="button" id="closeRegisterModal"
                         class="px-4 py-2 border rounded-md hover:bg-gray-100">
                         Annuler
                     </button>
-                    <button type="submit" 
+                    <button type="submit"
                         class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
                         S'inscrire
                     </button>
@@ -115,6 +135,7 @@ echo $_SESSION['user_role'];
         </div>
     </div>
 
-    <script src="/public/assets/js/visitor.js"></script>
+    <!-- <script src="/public/assets/js/visitor.js"></script> -->
 </body>
+
 </html>

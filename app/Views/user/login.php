@@ -29,44 +29,28 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
                 $_SESSION['user_email'] = $loggedInUser->getEmail();
                 $_SESSION['user_role'] = $loggedInUser->getRole();
 
+                
+                
                 if (isset($_SESSION['user_role'])) {
-                    // Rediriger selon le rôle de l'utilisateur
-                    switch ($_SESSION['user_role']) {
-                        case 'admin':
-                            header('Location: ../admin/dashboard_tags.php');
-                            break;
-                        case 'etudiant':
-                            header('Location: ../etudiant/dashboard.php');
-                            break;
-                        case 'enseignant':
-                            header('Location: ../teacher/dashboard.php');
-                            break;
-                        default:
-                            // Rediriger vers la page d'accueil par défaut
-                            header('Location: ../visiteur/visiteur.php');
-                            break;
+                    $roleRedirects = [
+                        'admin' => 'admin/dashboard_tags.php',
+                        'etudiant' => 'etudiant/dashboard.php',
+                        'enseignant' => 'teacher/dashboard.php'
+                    ];
+                
+                    if (array_key_exists($_SESSION['user_role'], $roleRedirects)) {
+                        header('Location: ' . $roleRedirects[$_SESSION['user_role']]);
+                        exit;
+                    } else {
+                        header('Location: visiter/visiteur.php');
+                        exit;
                     }
-                    exit;
                 } else {
-                    // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
-                    header('Location: ../visiteur/visiteur.php');
+                    header('Location: visiter/visiteur.php');
                     exit;
                 }
                 
-                // header('Location: __DIR__ . ../ " . $_SESSION['user_role'] . ".php;');
-
-
-
-                // header('Location: ../views/'.$_SESSION['user_role'].'.php');
-                // if($_SESSION['user_role'] ==='admin'){
-                //     header("Location: ../views/admin.php");
-                // }else if($_SESSION['user_role'] ==='membre'){
-                //     header("Location: ../views/membre.php");
-                // } else if($_SESSION['user_role'] ==='auteur'){
-                //     header("Location: ../views/auteur.php");
-                    
-                // }
-
+               
 
                 exit;
             } else {
