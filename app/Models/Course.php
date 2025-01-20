@@ -171,7 +171,31 @@ abstract class Course
         } else {
             throw new Exception("Erreur lors de l'ajout du cours dans la base de données.");
         }
+       
+
     }
+
+    public static function addCourseTags($tags)
+    {
+        $id_course = Database::getInstance()->getConnection()->lastInsertId();
+        echo 'test1' . $id_course; 
+    
+        $stmt = Database::getInstance()->getConnection()->prepare("INSERT INTO `course_tags`(`tag_id`, `course_id`) VALUES (:id_tag, :id_course)");
+    
+        foreach ($tags as $id_tag) {
+            $stmt->bindParam(':id_course', $id_course, PDO::PARAM_INT);  
+            $stmt->bindParam(':id_tag', $id_tag, PDO::PARAM_INT);  
+            try {
+                $stmt->execute();  
+                echo "Tag ID $id_tag inserted successfully.<br>";
+            } catch (PDOException $e) {
+                echo "Error inserting tag ID $id_tag: " . $e->getMessage() . "<br>";
+            }
+        }
+    }
+
+    
+
 
     public function updateCourse()
     {

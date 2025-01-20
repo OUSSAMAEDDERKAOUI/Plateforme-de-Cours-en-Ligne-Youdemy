@@ -93,6 +93,7 @@ print_r($courses);
                         <h3 class="text-xl text-indigo-600 mb-2"><?php echo htmlspecialchars($course->getCourseTitle()) ;?></h3>
                         <p class="text-gray-600 mb-4"> crée le <?php echo htmlspecialchars($course->getCreationDate()) ;?></p>
                         <p class="text-gray-500 text-sm mb-4"><?php echo htmlspecialchars($course->getCoursesDescription()) ;?></p>
+        
                         <div class="flex justify-between items-center">
                         <span class="text-lg font-bold text-indigo-600"><?php echo htmlspecialchars($course->getCourseType()) ;?></span>
                             <span class="text-lg font-bold text-indigo-600">Gratuit</span>

@@ -66,8 +66,12 @@ CREATE TABLE `courses` (
 
 CREATE TABLE `course_tags` (
   `tag_id` int(11) NOT NULL,
-  `course_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `course_id` int(11) NOT NULL,
+  PRIMARY KEY (`tag_id`, `course_id`),
+  FOREIGN KEY (`tag_id`) REFERENCES `tags` (`tag_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`course_id`) REFERENCES `courses` (`course_id`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 
 -- --------------------------------------------------------
 

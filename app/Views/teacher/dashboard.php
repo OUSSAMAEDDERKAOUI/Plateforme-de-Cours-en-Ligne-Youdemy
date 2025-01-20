@@ -39,7 +39,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $description = htmlspecialchars($_POST['description']);
         $categoryId = htmlspecialchars($_POST['category']);
         $course_type = htmlspecialchars($_POST['course_type']);
-        $courseTags = isset($_POST['courseTags']) ? $_POST['courseTags'] : [];
+        $tags = $_POST['courseTags'];
+        print_r($tags);
+
         $teacherId = 1; 
 
         $upload_img = $_FILES['course_image'];
@@ -54,12 +56,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         try {
             $course->addCourse();
+            $courseTags=Course::addCourseTags($tags);
+
             header('Location: ' . $_SERVER['PHP_SELF']);
             exit;
         } catch (Exception $e) {
 
             echo "Erreur : " . $e->getMessage();
         }
+
     }
 
     if (isset($_POST['deletecourse'])) {
@@ -392,7 +397,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || isset($_POST['deletecourse'])) {
                 echo '<div class="flex flex-wrap">';
                 foreach ($results as $result) {
                     echo '<div class="w-1/4 p-2">';
-                    echo '<input type="checkbox" name="courseTags[]" value="' . $result->gettagName() . '" id="tag_' . $result->gettagId(). '">';
+                    echo '<input type="checkbox" name="courseTags[]" value="' . $result->gettagId() . '" id="tag_' . $result->gettagId(). '">';
                     echo '<label for="tag_' . $result->gettagId(). '">' . $result->gettagName() . '</label>';
                     echo '</div>';
                 }
