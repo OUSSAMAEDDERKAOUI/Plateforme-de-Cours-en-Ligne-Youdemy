@@ -1,6 +1,12 @@
 
 <?php
 session_start();
+require_once __DIR__ . '../../../Models/Course.php';
+require_once __DIR__ . '../../../Models/CourseDocument.php';
+require_once __DIR__ . '../../../Models/CourseVideo.php';
+require_once __DIR__ . '../../../Models/Users.php';
+require_once __DIR__ . '../../../../config/database.php';
+
 if (!Users::isAuth('visiteur')) {
     if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
         if($_SESSION['user_role']=='admin'){
@@ -11,7 +17,7 @@ if (!Users::isAuth('visiteur')) {
         }
 }
 else {
-    header('Location: ../views/login.php');
+    header('Location: ../user/login.php');
 
 }
 }
@@ -96,12 +102,12 @@ if (isset($_POST['dec'])) {
                         <i class="fas fa-book"></i>
                         <span>Mes cours</span>
                     </a>
-                    <a href="./etudiant_explorer.php" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600" data-section="explore">
+                    <a href="./explorer.php" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600" data-section="explore">
                         <i class="fas fa-search"></i>
                         <span>Explorer</span>
                     </a>
                     
-                    <a href="./etudiant_profile.php" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600" data-section="profile">
+                    <a href="./profile.php" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600" data-section="profile">
                         <i class="fas fa-user"></i>
                         <span>Mon profil</span>
                     </a>

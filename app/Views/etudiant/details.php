@@ -1,13 +1,10 @@
-
 <?php
 session_start();
-
 require_once __DIR__ . '../../../Models/Course.php';
 require_once __DIR__ . '../../../Models/CourseDocument.php';
 require_once __DIR__ . '../../../Models/CourseVideo.php';
 require_once __DIR__ . '../../../Models/Users.php';
 require_once __DIR__ . '../../../../config/database.php';
-
 
 if (!Users::isAuth('visiteur')) {
     if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
@@ -19,11 +16,21 @@ if (!Users::isAuth('visiteur')) {
         }
 }
 else {
-    header('Location: ../views/login.php');
+    header('Location: ../user/login.php');
 
 }
 }
+
+if (isset($_POST['dec'])) {
+    session_unset();
+
+    session_destroy();
+
+    header('Location: ../user/login.php');
+    exit();
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -103,6 +110,12 @@ else {
                         <i class="fas fa-user"></i>
                         <span>Mon profil</span>
                     </a>
+                    <form action="" method="POST">
+                            <button name="dec" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600 ">
+                                <i class="fas fa-sign-out-alt mr-4"></i>
+                                Déconnexion
+                            </button>
+                </form>
                 </nav>
             </div>
         </aside>
@@ -136,71 +149,127 @@ else {
                     </div>
                 </header>
 
-               
 
-              
 
-    
+            <!-- //////////////////////////////////////////////////////////////////: -->
 
-            <div id="profile-section" class="section ">
-                <h2 class="text-2xl font-bold mb-6">Mon profil</h2>
-                <div class="max-w-4xl">
-                    <!-- Informations personnelles -->
-                    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-                        <div class="flex items-center space-x-6 mb-6">
-                            <img src="https://ui-avatars.com/api/?name=Alex+Doe&background=4F46E5&color=fff" 
-                                 alt="Profile" 
-                                 class="w-24 h-24 rounded-xl">
-                            <div>
-                                <h3 class="text-xl font-semibold">Alex Doe</h3>
-                                <p class="text-gray-600">Étudiant en développement web</p>
-                                <div class="flex items-center mt-2">
-                                    <i class="fas fa-map-marker-alt text-gray-400 mr-2"></i>
-                                    <span class="text-gray-600">Paris, France</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <h4 class="font-semibold mb-3">Informations de contact</h4>
-                                <div class="space-y-2">
-                                    <div class="flex items-center">
-                                        <i class="fas fa-envelope w-6 text-gray-400"></i>
-                                        <span class="text-gray-600">alex.doe@email.com</span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <i class="fas fa-phone w-6 text-gray-400"></i>
-                                        <span class="text-gray-600">+33 6 12 34 56 78</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold mb-3">Centres d'intérêt</h4>
-                                <div class="flex flex-wrap gap-2">
-                                    <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-sm">JavaScript</span>
-                                    <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-sm">React</span>
-                                    <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-sm">UX Design</span>
-                                    <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-sm">Python</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    
 
-                    
-                </div>
+
+            <div class="articles-grid grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6">
+                <?php
+
+
+                require_once '../classes/membre.php';
+
+                $membre = new Membre("", "", "", "", "", "","");
+
+
+
+                $id_article = $_GET['id'];
+
+
+                $result = $membre->showDetails($id_article);
+                if ($result) {
+                    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+
+                        $image = $row['image'];
+                        $image_user=$row['image_user'];
+                        echo '  <article class="bg-white rounded-lg shadow-lg overflow-hidden animate__animated animate__fadeIn">
+    <div class="relative">
+        <img src="' . htmlspecialchars($image) . '" alt="" class="w-full h-96 object-cover">
+       
+
+
+        <div class="absolute top-0 right-0 m-2">
+            <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-sm">
+              ' . $row['categorieTitre'] . ' </span>
+        </div>';
+      
+   echo' </div>
+    <div class="p-6">';
+                        echo '<div class="mb-8">';
+                        echo ' <h1 class="text-4xl font-bold text-gray-900 mb-4">' . $row['articleTitre'] . '</h1>
+        
+        <div class="flex items-center gap-4 mb-6">
+            <img src="'.htmlspecialchars($image_user).'" class="w-12 h-12 rounded-full" alt="Author">
+            <div>
+                <p class="font-semibold text-gray-900">' . ' ' . $row['nom'] . '  ' . $row['prenom'] . '  </p>
+                <p class="text-gray-500 text-sm">Publié le ' . $row['date_publication'] . '</p>
+            </div>
+        </div>
+    </div>
+          <pre class="text-gray-800 mb-2 whitespace-pre-line">' . $row['contenu'] . '
+        </pre>
+        <br>';
+            require_once '../classes/article_tag.php';
+                $TagArticle=new TagArticle("","");
+               $results= $TagArticle->getTagsByArticle($id_article);
+               if(count($results) > 0){
+                echo'<div class="flex  text-center gap-2 m-4 ">';
+                foreach($results as $res){
+                   echo' <div class="px-3 py-1  text-blue-600 rounded-full text-sm"># '.$res['nom_tag'].'</div>';
+                }
+                echo'</div>';
+            }
+      
+   echo' </div>';
+     
+echo'</article> ';
+                    }
+                }
+                
+                echo'<div class="m-4 flex items-center gap-2">
+                <a href="../functions/addLike.php?id='.$id_article.'">';
+                
+                  require_once '../classes/favoris.php';
+                    $showLikes=new Favoris("","");
+                    $Likes=$showLikes->showLikes($id_article);
+               echo' <button class="bg-blue-500 text-white px-4 py-2 rounded flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+                    </svg>
+                  
+
+                  '.$Likes['likescount'] .' J\'aimes
+                   
+               </button>
+                </a>
+                
+            </div>'
+                ?>
+
             </div>
 
-           
-           
 
-        </main>
-    </div>
+            
+            
 
-   
+            
+    </main>
 
-    
-    <script src="assets/js/student-dashboard.js"></script>
-</body>
-</html>
+    <!-- Footer -->
+    <footer class="bg-gray-900 mt-12">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <div class="text-white">
+                    <h3 class="text-2xl font-bold">MelodyHub</h3>
+                    <p class="mt-2 text-gray-400">Votre passerelle vers la culture</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-gray-300">
+                        <i class="fab fa-facebook text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-gray-300">
+                        <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-gray-300">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    </html>

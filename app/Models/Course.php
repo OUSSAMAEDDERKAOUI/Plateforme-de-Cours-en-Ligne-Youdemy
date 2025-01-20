@@ -194,7 +194,22 @@ abstract class Course
         }
     }
 
+    public static function gettagscourse($course_id)
+{
     
+    
+        $stmt = Database::getInstance()->getConnection()->prepare("SELECT tag_name
+                                                                FROM tags  JOIN course_tags ON tags.tag_id=course_tags.tag_id
+                                                                WHERE course_tags.course_id=:course_id");
+        $stmt->bindParam(':course_id',$course_id,PDO::PARAM_INT);
+        try{
+            $stmt->execute();
+        }catch(PDOException $e){
+            throw new Exception("Erreur lors de l'affichage de tags.");
+        }
+        $resultats=$stmt->fetchAll(PDO::FETCH_ASSOC);
+             return $resultats ;
+    }
 
 
     public function updateCourse()
