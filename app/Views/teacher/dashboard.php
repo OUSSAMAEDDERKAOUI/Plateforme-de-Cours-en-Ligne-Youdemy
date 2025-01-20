@@ -5,6 +5,7 @@ require_once __DIR__ . '../../../Models/CourseVideo.php';
 require_once __DIR__ . '../../../Models/Users.php';
 
 require_once __DIR__ . '../../../../config/database.php';
+session_start();
 
 if (isset($_POST['dec'])) {
     session_unset();
@@ -15,11 +16,21 @@ if (isset($_POST['dec'])) {
     exit();
 }
 
-session_start();
 
-if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'enseignant') {
-    header('Location: ../visiteur/visiteur.php');
-    exit;
+if (!Users::isAuth('visiteur')) {
+    if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
+        if($_SESSION['user_role']=='admin'){
+            header('Location: ../admin/dashboard_category.php');
+        }
+      
+        if($_SESSION['user_role']=='etudiant'){
+            header('Location: ../etudiant/dashboard.php');
+        }
+}
+else {
+    header('Location: ../views/login.php');
+
+}
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -60,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_GET['id'])) {
         $courseId = $_GET['id'];
     
+        $course = Course::getCourseById($courseId); 
         if ($course) {
             $courseTitle = $course->getCourseTitle();
             $courseDescription = $course->getCoursesDescription();         
@@ -104,7 +116,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
    
 }
-$course = Course::getCourseById($courseId); 
 
 
 $coursesDocument = CourseDocument::showCourses();
@@ -363,7 +374,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || isset($_POST['deletecourse'])) {
                     <label class="block text-sm font-medium text-gray-700">Catégorie</label>
                     <?php
                     require_once '../../Models/Category.php';
-                    $categories = new Category("", "", "", "", "");
+                    $categories = new Category("","", "", "", "", "");
                     $rows = $categories->showCategory();
                     echo '<select name="category" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">';
                     foreach ($rows as $row) {
@@ -375,14 +386,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || isset($_POST['deletecourse'])) {
 
                 <label class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
                 <?php
-                require_once '../../Models/Tags.php';
-                $tags = new Tags("", "", "", "");
+             require_once '../../Models/Tags.php';
+                $tags = new Tags("", "", "", "","");
                 $results = $tags->showTags();
                 echo '<div class="flex flex-wrap">';
                 foreach ($results as $result) {
                     echo '<div class="w-1/4 p-2">';
-                    echo '<input type="checkbox" name="courseTags[]" value="' . $result['tag_id'] . '" id="tag_' . $result['tag_id'] . '">';
-                    echo '<label for="tag_' . $result['tag_id'] . '">' . $result['tag_name'] . '</label>';
+                    echo '<input type="checkbox" name="courseTags[]" value="' . $result->gettagName() . '" id="tag_' . $result->gettagId(). '">';
+                    echo '<label for="tag_' . $result->gettagId(). '">' . $result->gettagName() . '</label>';
                     echo '</div>';
                 }
                 echo '</div>';
@@ -446,7 +457,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || isset($_POST['deletecourse'])) {
                     <label class="block text-sm font-medium text-gray-700">Catégorie</label>
                     <?php
                     require_once '../../Models/Category.php';
-                    $categories = new Category("", "", "", "", "");
+                    $categories = new Category("","", "", "", "", "");
                     $rows = $categories->showCategory();
                     echo '<select name="modify_category" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">';
                     foreach ($rows as $row) {
@@ -458,14 +469,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || isset($_POST['deletecourse'])) {
 
                 <label class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
                 <?php
-                require_once '../../Models/Tags.php';
-                $tags = new Tags("", "", "", "");
+                 require_once '../../Models/Tags.php';
+                $tags = new Tags("", "", "", "","");
                 $results = $tags->showTags();
                 echo '<div class="flex flex-wrap">';
                 foreach ($results as $result) {
                     echo '<div class="w-1/4 p-2">';
-                    echo '<input type="checkbox" name="modify_courseTags[]" value="' . $result['tag_id'] . '" id="tag_' . $result['tag_id'] . '">';
-                    echo '<label for="tag_' . $result['tag_id'] . '">' . $result['tag_name'] . '</label>';
+                    echo '<input type="checkbox" name="courseTags[]" value="' . $result->gettagName() . '" id="tag_' . $result->gettagId(). '">';
+                    echo '<label for="tag_' . $result->gettagId(). '">' . $result->gettagName() . '</label>';
                     echo '</div>';
                 }
                 echo '</div>';

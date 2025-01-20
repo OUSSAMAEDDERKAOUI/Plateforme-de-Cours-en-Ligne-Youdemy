@@ -29,26 +29,52 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
                 $_SESSION['user_email'] = $loggedInUser->getEmail();
                 $_SESSION['user_role'] = $loggedInUser->getRole();
 
-                
-                
-                if (isset($_SESSION['user_role'])) {
-                    $roleRedirects = [
-                        'admin' => 'admin/dashboard_tags.php',
-                        'etudiant' => 'etudiant/dashboard.php',
-                        'enseignant' => 'teacher/dashboard.php'
-                    ];
-                
-                    if (array_key_exists($_SESSION['user_role'], $roleRedirects)) {
-                        header('Location: ' . $roleRedirects[$_SESSION['user_role']]);
-                        exit;
-                    } else {
-                        header('Location: visiter/visiteur.php');
-                        exit;
-                    }
-                } else {
-                    header('Location: visiter/visiteur.php');
-                    exit;
+
+
+
+                if (!Users::isAuth('visiteur')) {
+                    if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
+                        if($_SESSION['user_role']=='admin'){
+                            header('Location: ../admin/dashboard_category.php');
+                        }
+                        if($_SESSION['user_role']=='enseignant'){
+                            header('Location: ../teacher/dashboard.php');
+                        }
+                        if($_SESSION['user_role']=='etudiant'){
+                            header('Location: ../etudiant/dashboard.php');
+                        }
                 }
+                else {
+                    header('Location: ../visiteur/categories.php');
+                
+                }
+                }
+
+
+                
+
+
+
+
+                
+                // if (isset($_SESSION['user_role'])) {
+                //     $roleRedirects = [
+                //         'admin' => 'admin/dashboard_tags.php',
+                //         'etudiant' => 'etudiant/dashboard.php',
+                //         'enseignant' => 'teacher/dashboard.php'
+                //     ];
+                
+                //     if (array_key_exists($_SESSION['user_role'], $roleRedirects)) {
+                //         header('Location: ' . $roleRedirects[$_SESSION['user_role']]);
+                //         exit;
+                //     } else {
+                //         header('Location: visiter/visiteur.php');
+                //         exit;
+                //     }
+                // } else {
+                //     header('Location: visiter/visiteur.php');
+                //     exit;
+                // }
                 
                
 

@@ -13,6 +13,7 @@ abstract class Course
     protected $teacherId;
     protected $categoryId;
     protected $courseType;
+    protected $courseTags;
 
 
 
@@ -83,6 +84,10 @@ abstract class Course
     {
         return $this->courseType;
     }
+    public function getCourseTags()
+    {
+        return $this->courseTags;
+    }
     
 
     // ------------------- Setters -------------------------
@@ -134,6 +139,10 @@ abstract class Course
     public function setCourseType($courseType)
     {
         $this->courseType = $courseType;
+    }
+    public function setcourseTags($CourseTags)
+    {
+        $this->courseTags = $CourseTags;
     }
 
 

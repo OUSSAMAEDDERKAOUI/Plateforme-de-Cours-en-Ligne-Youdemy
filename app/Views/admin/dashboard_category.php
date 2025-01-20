@@ -1,20 +1,25 @@
 <?php
-// session_start();
-// if (isset($_SESSION['user_role'])) {
-//     switch ($_SESSION['user_role']) {
-//         case 'admin':
-//             header('Location: ../admin/dashboard_tags.php');
-//             break;
+require_once __DIR__ . '../../../Models/Users.php';
+
+session_start();
+if (!Users::isAuth('visiteur')) {
+    if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
        
-//         default:
-//             header('Location: ../user/login.php');
-//             break;
-//     }
-//     exit;
-// } else {
-//     header('Location: ../visiteur/visiteur.php');
-//     exit;
-// }
+        if($_SESSION['user_role']=='enseignant'){
+            header('Location: ../teacher/dashboard.php');
+        }
+        if($_SESSION['user_role']=='etudiant'){
+            header('Location: ../etudiant/dashboard.php');
+        }
+}
+else {
+    header('Location: ../visiteur/categories.php');
+
+}
+}
+
+
+
 require_once __DIR__ . '../../../Models/Category.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

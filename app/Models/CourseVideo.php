@@ -3,10 +3,8 @@ require_once __DIR__ . './Course.php';
 
 class CourseVideo extends Course
 {
-    // Redéfinition de la méthode uploadFile pour les vidéos
     public function uploadFile()
     {
-        // Upload de l'image de couverture
         if (isset($_FILES['course_image']) && $_FILES['course_image']['error'] === UPLOAD_ERR_OK) {
             $courseConverture = $_FILES['course_image'];
             $file_ext = strtolower(pathinfo($courseConverture['name'], PATHINFO_EXTENSION));
@@ -27,7 +25,6 @@ class CourseVideo extends Course
             throw new Exception("Aucune image téléchargée.");
         }
 
-        // Upload du fichier vidéo
         if (isset($_FILES['course_file']) && $_FILES['course_file']['error'] === UPLOAD_ERR_OK) {
             $courseVideo = $_FILES['course_file'];
             $file_ext_video = strtolower(pathinfo($courseVideo['name'], PATHINFO_EXTENSION));

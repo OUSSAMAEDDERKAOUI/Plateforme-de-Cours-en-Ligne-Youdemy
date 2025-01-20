@@ -1,23 +1,23 @@
 <?php
 require_once __DIR__ . '../../../Models/Tags.php';
+require_once __DIR__ . '../../../Models/Users.php';
 
 session_start();
-if (isset($_SESSION['user_role'])) {
-    switch ($_SESSION['user_role']) {
-        case 'admin':
-            header('Location: ../admin/dashboard_tags.php');
-            break;
-
-        default:
-            header('Location: ../user/login.php');
-            break;
-    }
-    exit;
-} else {
-    header('Location: ../visiteur/visiteur.php');
-    exit;
+if (!Users::isAuth('visiteur')) {
+    if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
+        
+        if($_SESSION['user_role']=='enseignant'){
+            header('Location: ../teacher/dashboard.php');
+        }
+        if($_SESSION['user_role']=='etudiant'){
+            header('Location: ../etudiant/dashboard.php');
+        }
 }
+else {
+    header('Location: ../visiteur/categories.php');
 
+}
+}
 
 
 
@@ -251,18 +251,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || isset($_POST['delete'])) {
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="tagsList">
                             <?php
-                            $Tag = new Tags("", "", "");
+                            $Tag = new Tags("", "", "","","");
                             $rows = $Tag->showTags();
+
                             foreach ($rows as $row) {
                                 echo ' <div class="bg-white p-4 rounded-lg shadow border">
                             <div class="flex justify-between items-center">
                                 <div>
-                                    <h5 class="font-semibold">' . $row['tag_name'] . '</h5>
-                                    <p class="text-sm text-gray-500">' . $row['tag_description'] . '</p>
-                                    <p class="text-sm text-gray-500">' . $row['creation_date'] . '</p>
+                                    <h5 class="font-semibold">' . $row->gettagName(). '</h5>
+                                    <p class="text-sm text-gray-500">' . $row->getDescription(). '</p>
+                                    <p class="text-sm text-gray-500">' . $row->getCreationDate() . '</p>
                                 </div>
                                 <div class="space-x-2">
-                                    <form method="POST" action="?id=' . htmlspecialchars($row['tag_id']) . '">
+                                    <form method="POST" action="?id=' . htmlspecialchars($row->gettagId()) . '">
                                         <button id="modifyTag" onclick="showAddTagModal()" class="text-indigo-600 hover:text-indigo-900" name="updatetag">
                                             <i class="fas fa-edit"></i>
                                         </button>

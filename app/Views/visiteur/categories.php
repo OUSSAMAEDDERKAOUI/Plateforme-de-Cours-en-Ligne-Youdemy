@@ -3,7 +3,7 @@
 // echo $_SESSION['user_role'];
 require_once __DIR__ . '../../../Models/Category.php';
 $categories = Category::showVisiteurCategory();
-print_r($categories);
+// print_r($categories);
 
 ?>
 

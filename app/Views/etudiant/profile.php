@@ -1,20 +1,19 @@
 
 <?php
 session_start();
-if (isset($_SESSION['user_role'])) {
-    switch ($_SESSION['user_role']) {
-        case 'etudiant':
-            header('Location: ../etudiant/dashboard.php');
-            break;
-       
-        default:
-            header('Location: ../user/login.php');
-            break;
-    }
-    exit;
-} else {
-    header('Location: ../visiteur/visiteur.php');
-    exit;
+if (!Users::isAuth('visiteur')) {
+    if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
+        if($_SESSION['user_role']=='admin'){
+            header('Location: ../admin/dashboard_category.php');
+        }
+        if($_SESSION['user_role']=='enseignant'){
+            header('Location: ../teacher/dashboard.php');
+        }
+}
+else {
+    header('Location: ../views/login.php');
+
+}
 }
 ?>
 <!DOCTYPE html>

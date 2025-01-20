@@ -242,7 +242,9 @@ public function searchUserByName($name)
             $result['nom'],
             $result['prenom'],
             $result['email'],
-            $result['password']
+            $result['password'],
+            $result['password'],
+
         );
     }
 
@@ -267,7 +269,9 @@ public function getUserById($id)
             $result['nom'],
             $result['prenom'],
             $result['email'],
+            $result['password'],
             $result['password']
+
         );
     }
 
@@ -283,7 +287,7 @@ public static function findByEmail($email) {
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($result) {
-        return new Users($result['id'], $result['nom'], $result['prenom'], $result['email'], $result['password']);
+        return new Users($result['id'], $result['nom'], $result['prenom'], $result['email'], $result['password'],$result['password']);
     }
 
     return null;
@@ -311,7 +315,7 @@ if (self::findByEmail($email)) {
 }
 
 // Create a new user object
-$user = new Users($nom, $prenom, $email,'',$role);
+$user = new Users($nom, $prenom, $email,'',$role,'');
 $user->setPasswordHash($password); // Hash the password
 return $user->save();
 }

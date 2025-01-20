@@ -8,10 +8,10 @@ class Tags {
     protected $creationDate;
     protected $tagStatus;
 
-    public function __construct($tagName, $tagDescription,$creationDate=null, $tagStatus=null) {
+    public function __construct($tagId,$tagName, $tagDescription,$creationDate=null, $tagStatus=null) {
+        $this->tagId = $tagId ;
         $this->tagName = $tagName;
         $this->tagDescription = $tagDescription;
-
         $this->creationDate = $creationDate ?? date('Y-m-d');
         $this->tagStatus = $tagStatus ?? 'actif';
     }
@@ -63,12 +63,10 @@ class Tags {
     }
 
 public function addTag() {
-    // Vérifier si les informations sont valides
     if (empty($this->tagName) || empty($this->tagDescription)) {
         throw new InvalidArgumentException("Le nom ou la description du tag sont manquants.");
     }
     
-    // Expressions régulières pour valider côté serveur
     if (!preg_match('/^[a-zA-Z0-9\s]{3,50}$/', $this->tagName)) {
         throw new InvalidArgumentException("Le nom du tag doit contenir entre 3 et 50 caractères, avec des lettres, des chiffres et des espaces.");
     }
@@ -83,12 +81,10 @@ public function addTag() {
 
     $stmt = Database::getInstance()->getConnection()->prepare($query);
 
-    // Bind des paramètres
     $stmt->bindValue(':tagName', $this->tagName, PDO::PARAM_STR);
     $stmt->bindValue(':tagDescription', $this->tagDescription, PDO::PARAM_STR);
 
     try {
-        // Exécuter la requête
         $stmt->execute();
         echo 'Tag ajouté avec succès.';
     } catch (PDOException $e) {
@@ -101,10 +97,20 @@ public function showTags() {
 
     try {
         $stmt->execute();
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if (!empty($result)) {
-            return $result;
+        if (!empty($results)) {
+            $resultsArray=[];
+
+            foreach($results as $result){
+                $resultsArray[]=new self(
+                    $result['tag_id'],
+                    $result['tag_name'],
+                    $result['tag_description'],
+                    $result['creation_date']
+                );
+            }
+            return $resultsArray;
         } else {
             throw new Exception("Aucun tag trouvé.");
         }
@@ -124,7 +130,6 @@ public function getTagById($tagId) {
     $stmt->bindValue(':tagId', $tagId, PDO::PARAM_INT);
 
     try {
-        // Exécuter la requête
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
@@ -136,7 +141,6 @@ public function getTagById($tagId) {
 
 
 public function updateTag() {
-    // Vérifier si les informations sont valides
     if (empty($this->tagName) || empty($this->tagDescription) || empty($this->tagId)) {
         throw new InvalidArgumentException("Les informations nécessaires sont manquantes.");
     }
@@ -147,13 +151,11 @@ public function updateTag() {
 
     $stmt = Database::getInstance()->getConnection()->prepare($query);
 
-    // Bind des paramètres
     $stmt->bindValue(':tagName', $this->tagName, PDO::PARAM_STR);
     $stmt->bindValue(':tagDescription', $this->tagDescription, PDO::PARAM_STR);
     $stmt->bindValue(':tagId', $this->tagId, PDO::PARAM_INT);
 
     try {
-        // Exécuter la requête
         $stmt->execute();
         echo 'Le tag a été mis à jour avec succès.';
     } catch (PDOException $e) {
