@@ -3,6 +3,8 @@ require_once __DIR__ . '../../../Models/Course.php';
 require_once __DIR__ . '../../../Models/CourseDocument.php';
 require_once __DIR__ . '../../../Models/CourseVideo.php';
 require_once __DIR__ . '../../../Models/Users.php';
+require_once __DIR__ . '../../../Models/Etudiants.php';
+require_once __DIR__ . '../../../Models/Enseignants.php';
 
 require_once __DIR__ . '../../../../config/database.php';
 session_start();
@@ -32,6 +34,7 @@ else {
 
 }
 }
+$teacherId = $_SESSION['user_id']; 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['addCourse'])) {
@@ -42,7 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $tags = $_POST['courseTags'];
         print_r($tags);
 
-        $teacherId = $_SESSION['user_id']; 
 
         $upload_img = $_FILES['course_image'];
 
@@ -98,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $courseTags = isset($_POST['modify_courseTags']) ? $_POST['modify_courseTags'] : [];
         $courseId = $_GET['id'];
 
-        $teacherId = 1; 
+        $teacherId = $_SESSION['user_id']; 
 
         $upload_img = $_FILES['course_image'];
 
@@ -127,6 +129,9 @@ $coursesDocument = CourseDocument::showCourses();
 $coursesVideo = CourseVideo::showCourses();
 
 
+$nbrOfCourses=new Enseignants("","","","","","","");
+$nbr=$nbrOfCourses->nbrOfCourse($teacherId);
+$count=$nbrOfCourses->nbrOfStudents($teacherId);
 
 
 
@@ -201,11 +206,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || isset($_POST['deletecourse'])) {
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="bg-white p-6 rounded-lg shadow">
                         <h3 class="text-lg font-semibold mb-2">Total Étudiants</h3>
-                        <p class="text-3xl font-bold text-indigo-600">245</p>
+                        <p class="text-3xl font-bold text-indigo-600"><?php echo $count ;?></p>
                     </div>
                     <div class="bg-white p-6 rounded-lg shadow">
                         <h3 class="text-lg font-semibold mb-2">Cours Actifs</h3>
-                        <p class="text-3xl font-bold text-green-600">12</p>
+                        <p class="text-3xl font-bold text-green-600"><?php echo $nbr['nbrOfCourses'] ;?></p>
                     </div>
                     <div class="bg-white p-6 rounded-lg shadow">
                         <h3 class="text-lg font-semibold mb-2">Revenus du mois</h3>

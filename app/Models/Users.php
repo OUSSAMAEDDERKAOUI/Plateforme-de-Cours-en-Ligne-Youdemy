@@ -11,7 +11,8 @@ protected $role;
 protected $status;
 
 
-public function __construct($fName,$lName,$email,$password,$role,$status){
+public function __construct($userId,$fName,$lName,$email,$password,$role,$status){
+    $this->userId=$userId;
     $this->fName=$fName;
     $this->lName=$lName;
     $this->email=$email;
@@ -243,7 +244,10 @@ public function searchUserByName($name)
             $result['prenom'],
             $result['email'],
             $result['password'],
-            $result['password'],
+            $result['role'],
+            $result['status'],
+
+
 
         );
     }
@@ -270,79 +274,23 @@ public function getUserById($id)
             $result['prenom'],
             $result['email'],
             $result['password'],
-            $result['password']
+            $result['role'],
+            $result['status']
 
         );
     }
 
-    return null; // User not found
-}
-
-// Static method to search user by email
-public static function findByEmail($email) {
-    $db = Database::getInstance()->getConnection();
-    $stmt = $db->prepare("SELECT * FROM users WHERE email = :email");
-    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-    $stmt->execute();
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($result) {
-        return new Users($result['id'], $result['nom'], $result['prenom'], $result['email'], $result['password'],$result['password']);
-    }
-
-    return null;
-}
-
-// Method to register a new user (signup)
-public static function regester($nom, $prenom, $email, $password,$role) {
-// Validate email format
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    throw new Exception("Invalid email format");
-}
-
-// Validate password length
-if (strlen($password) < 6) {
-    throw new Exception("Password must be at least 6 characters long");
-}
-
-// Sanitize name fields
-$nom = htmlspecialchars($nom);
-$prenom = htmlspecialchars($prenom);
-
-// Check if email already exists
-if (self::findByEmail($email)) {
-    throw new Exception("Email is already registered");
-}
-
-// Create a new user object
-$user = new Users($nom, $prenom, $email,'',$role,'');
-$user->setPasswordHash($password); // Hash the password
-return $user->save();
+    return null; 
 }
 
 
-// Method to login (signin)
-public static function signin($email, $password) {
-    $user = self::findByEmail($email);
 
-    // Check if user exists and password is correct
-    if (!$user || !password_verify($password, $user->password)) {
-        throw new Exception("Invalid email or password");
-    }
 
-    return $user; // Successful login
-}
 
-// Method to change the user's password
-public function changePassword($newPassword) {
-    $this->setPasswordHash($newPassword); // Hash the new password
-    $db = Database::getInstance()->getConnection();
-    $stmt = $db->prepare("UPDATE users SET password = :password WHERE id = :id");
-    $stmt->bindParam(':password', $this->password, PDO::PARAM_STR);
-    $stmt->bindParam(':id', $this->userId, PDO::PARAM_INT);
-    $stmt->execute();
-}
-} 
+
+
+
+ }
 
 
 

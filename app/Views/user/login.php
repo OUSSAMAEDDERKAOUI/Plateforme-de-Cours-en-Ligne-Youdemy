@@ -15,7 +15,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
         }else {
             echo'4';
 
-            $user = new Users("","","","","","");
+            $user = new Users("","","","","","","");
 
             $loggedInUser = $user->login( $postEmail, $postPassword);
 

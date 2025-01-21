@@ -141,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD']!=='POST' || isset($_POST['delete'])) {
                         </a>
                     </li>
                     <li>
-                        <a href="./dashboard_admin_tags.php" class="w-full flex items-center p-2 hover:bg-indigo-700 rounded">
+                        <a href="./dashboard_tags.php" class="w-full flex items-center p-2 hover:bg-indigo-700 rounded">
                             <i class="fas fa-tags w-6"></i>
                             <span> Tags</span>
                         </a>

@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || isset($_POST['delete'])) {
                         </a>
                     </li>
                     <li>
-                        <a href="./dashboard_admin_users.php" class="w-full flex items-center p-2 hover:bg-indigo-700 rounded">
+                        <a href="./dashboard_users.php" class="w-full flex items-center p-2 hover:bg-indigo-700 rounded">
                             <i class="fas fa-users w-6"></i>
                             <span>Utilisateurs</span>
                         </a>
@@ -158,7 +158,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || isset($_POST['delete'])) {
                 </div>
             </header>
 
-            </header>
 
             <!-- Content Sections -->
             <div class="p-6">

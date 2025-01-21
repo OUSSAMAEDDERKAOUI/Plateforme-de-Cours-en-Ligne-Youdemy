@@ -48,7 +48,7 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
         // echo 'courseId' .$courseId . '<br>';
         $etudiantId=$_SESSION['user_id'];
         // echo 'etudiantId'. $etudiantId;
-        $inscris=new Etudiants("","","","","","");
+        $inscris=new Etudiants("","","","","","","");
        $inscris->inscrire($etudiantId,$courseId) ;
 header('location: ../etudiant/details.php?id='.$courseId);
     }

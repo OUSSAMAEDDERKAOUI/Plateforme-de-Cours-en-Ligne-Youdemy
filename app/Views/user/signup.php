@@ -20,19 +20,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Users::signup($nom, $prenom, $email, $password,$role);
             if( $role==='etudiant'){
                 $status='accepté' ;
-                $etudiant = new Etudiants($nom, $prenom, $email, $password, $role,$status);
+                $etudiant = new Etudiants("",$nom, $prenom, $email, $password, $role,$status);
 
                 $etudiant->signup();
                 // echo'holaaaa&13';
-                // header("location: ./login.php");
+                header("location: ./login.php");
             }
             else  if( $role==='enseignant'){
                 $status='en attente' ;
 
-                $enseignant = new Enseignants($nom, $prenom, $email, $password, $role,$status);
+                $enseignant = new Enseignants("",$nom, $prenom, $email, $password, $role,$status);
                 $enseignant->signup();
                 // echo'holaaaa&13';
-                // header("location: ./login.php");
+                header("location: ./login.php");
             }
            
         } catch (Exception $e) {

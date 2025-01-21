@@ -1,20 +1,31 @@
 
 <?php
+require_once __DIR__ . '../../../Models/Tags.php';
+require_once __DIR__ . '../../../Models/Users.php';
+
 session_start();
-if (isset($_SESSION['user_role'])) {
-    switch ($_SESSION['user_role']) {
-        case 'admin':
-            header('Location: ../admin/dashboard_tags.php');
-            break;
-       
-        default:
-            header('Location: ../user/login.php');
-            break;
-    }
-    exit;
-} else {
-    header('Location: ../visiteur/visiteur.php');
-    exit;
+if (!Users::isAuth('visiteur')) {
+    if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
+        
+        if($_SESSION['user_role']=='enseignant'){
+            header('Location: ../teacher/dashboard.php');
+        }
+        if($_SESSION['user_role']=='etudiant'){
+            header('Location: ../etudiant/dashboard.php');
+        }
+}
+else {
+    header('Location: ../visiteur/categories.php');
+
+}
+}
+if (isset($_POST['dec'])) {
+    session_unset();
+
+    session_destroy();
+
+    header('Location: ../user/login.php');
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -41,14 +52,15 @@ if (isset($_SESSION['user_role'])) {
             </div>
             <nav>
                 <ul class="space-y-2">
-                <li>
+                <ul class="space-y-2">
+                    <li>
                         <a href="./dashboard_admin.php" class="w-full flex items-center p-2 hover:bg-indigo-700 rounded">
                             <i class="fas fa-chart-line w-6"></i>
                             <span>Tableau de bord</span>
                         </a>
                     </li>
                     <li>
-                        <a href="./dashboard_admin_users.php" class="w-full flex items-center p-2 hover:bg-indigo-700 rounded">
+                        <a href="./dashboard_users.php" class="w-full flex items-center p-2 hover:bg-indigo-700 rounded">
                             <i class="fas fa-users w-6"></i>
                             <span>Utilisateurs</span>
                         </a>
@@ -60,9 +72,15 @@ if (isset($_SESSION['user_role'])) {
                         </a>
                     </li>
                     <li>
-                        <a href="./dashboard_admin_category_tags.php" class="w-full flex items-center p-2 hover:bg-indigo-700 rounded">
+                        <a href="./dashboard_category.php" class="w-full flex items-center p-2 hover:bg-indigo-700 rounded">
                             <i class="fas fa-tags w-6"></i>
-                            <span>Catégories & Tags</span>
+                            <span>Catégories</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="./dashboard_tags.php" class="w-full flex items-center p-2 hover:bg-indigo-700 rounded">
+                            <i class="fas fa-tags w-6"></i>
+                            <span> Tags</span>
                         </a>
                     </li>
                 </ul>
@@ -78,9 +96,13 @@ if (isset($_SESSION['user_role'])) {
                     <h2 id="sectionTitle" class="text-xl font-semibold">Tableau de bord</h2>
                     <div class="flex items-center space-x-4">
                         <span class="text-gray-600">Admin</span>
-                        <button onclick="logout()" class="text-red-600 hover:text-red-800">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </button>
+
+                        <form action="" method="POST">
+                            <button name="dec" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Déconnexion
+                            </button>
+                        </form>
                     </div>
                 </div>
             </header>
