@@ -77,7 +77,6 @@ public function signup()
         return;
     }
 
-    // Validation du prénom et du nom 
     $nameRegex = '/^[A-Za-zÀ-ÿÉéÈèÊêËëÏïÎîÔôÖöÙùÜüÇç\' -]+$/';
 
     if (!preg_match($nameRegex, $this->fName)) {
@@ -90,7 +89,6 @@ public function signup()
         return;
     }
 
-    // Validation de l'email 
     if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
         echo "L'email fourni n'est pas valide.";
         return;
@@ -125,7 +123,6 @@ public function signup()
 
         try {
             $stmt->execute();
-            // echo "Inscription réussie !";
         } catch (PDOException $e) {
             throw new Exception('Une erreur est survenue lors de l\'inscription : ' . $e->getMessage(), (int)$e->getCode());
         }
@@ -171,40 +168,10 @@ public  function login($postEmail , $postPassword){
 
 
 
-// Password hashing method
 private function setPasswordHash($password) {
     $this->password = password_hash($password, PASSWORD_BCRYPT);
 }
 
-// Save user to the database
-public  function save() {
-    $db = Database::getInstance()->getConnection();
-    try {
-        if ($this->userId) { // Vérifiez si l'utilisateur existe déjà
-            $stmt = $db->prepare("UPDATE users SET nom = :nom, prenom = :prenom, email = :email WHERE id = :id");
-            $stmt->bindParam(':id', $this->userId, PDO::PARAM_INT);
-            $stmt->bindParam(':nom', $this->fName, PDO::PARAM_STR);
-            $stmt->bindParam(':prenom', $this->lName, PDO::PARAM_STR);
-            $stmt->bindParam(':email', $this->email, PDO::PARAM_STR);
-            $stmt->execute();
-            echo'1';
-
-        } else {
-            $stmt = $db->prepare("INSERT INTO users (nom, prenom, email, password, role) VALUES (:nom, :prenom, :email, :password, :role)");
-            $stmt->bindParam(':nom', $this->fName, PDO::PARAM_STR);
-            $stmt->bindParam(':prenom', $this->lName, PDO::PARAM_STR);
-            $stmt->bindParam(':email', $this->email, PDO::PARAM_STR);
-            $stmt->bindParam(':password',$this->password, PDO::PARAM_STR);
-
-            $stmt->execute();
-            $this->userId = $db->lastInsertId(); // Récupérez le dernier ID inséré
-        }
-        return $this->userId;
-    } catch (PDOException $e) {
-        error_log("Database error: " . $e->getMessage());
-        throw new Exception("An error occurred while saving the user.");
-    }
-}
 
 public static function isAuth($role)
 {
@@ -218,49 +185,11 @@ public static function isAuth($role)
 }
 
 
-    // Search user by name
-public function searchUserByName($name)
-{
-    $db = Database::getInstance()->getConnection();
-
-    // Prepare the SQL query
-    $stmt = $db->prepare("SELECT * FROM users WHERE nom LIKE :name OR prenom LIKE :name");
-
-    // Bind the parameter for name search (using wildcards for partial match)
-    $stmt->bindValue(':name', '%' . $name . '%', PDO::PARAM_STR);
-
-    // Execute the query
-    $stmt->execute();
-
-    // Fetch all matching users
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Return an array of User objects
-    $users = [];
-    foreach ($results as $result) {
-        $users[] = new Users(
-            $result['id'],
-            $result['nom'],
-            $result['prenom'],
-            $result['email'],
-            $result['password'],
-            $result['role'],
-            $result['status'],
-
-
-
-        );
-    }
-
-    return $users;
-}
-
-// Get user by ID
+    
 public function getUserById($id)
 {
     $db = Database::getInstance()->getConnection();
 
-    // Prepare the SQL query
     $stmt = $db->prepare("SELECT * FROM users WHERE id = :id");
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     $stmt->execute();

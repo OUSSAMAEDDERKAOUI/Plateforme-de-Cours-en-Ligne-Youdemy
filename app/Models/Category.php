@@ -142,10 +142,14 @@ public function showCategory() {
         return null;
     }
 }
-public static function showVisiteurCategory() {
+public static function showVisiteurCategories($depart,$limit) {
     $stmt = Database::getInstance()->getConnection()->prepare(" SELECT * FROM categories
         
-        WHERE categories.category_status = 'actif'" );
+        WHERE categories.category_status = 'actif' 
+        order by category_title 
+        LIMIT :limit OFFSET :depart " );
+        $stmt->bindParam(':depart',$depart,PDO::PARAM_INT);
+        $stmt->bindParam(':limit',$limit,PDO::PARAM_INT);
 
     try {
         $stmt->execute();
@@ -178,6 +182,59 @@ public static function showVisiteurCategory() {
         return null;
     }
 }
+
+
+
+public static function showVisiteurCategory() {
+    $stmt = Database::getInstance()->getConnection()->prepare(" SELECT * FROM categories
+        
+        WHERE categories.category_status = 'actif' " );
+
+    try {
+        $stmt->execute();
+
+        $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!empty($categories)) {
+            $categoriesarray=[];
+            foreach($categories as $Category){
+                $categoriesarray[]=new self(
+                    $Category['category_id'],
+                    $Category['category_title'],
+                    $Category['category_description'],
+                    $Category['creation_date'],
+                    $Category['category_status'],
+                    $Category['categoryCouverture']
+                );
+            }
+           
+            return $categoriesarray;
+        } else {
+            throw new Exception("Aucune catégorie trouvée.");
+        }
+
+    } catch (PDOException $e) {
+        echo "Erreur de base de données : " . $e->getMessage();
+        return null;
+    } catch (Exception $e) {
+        echo "Erreur : " . $e->getMessage();
+        return null;
+    }
+}
+
+
+public static function countCategories(){
+    try{
+        $sql = "SELECT COUNT(*) AS nbr_categories FROM categories WHERE categories.category_status = 'actif'";
+        $stmt = Database::getInstance()->getConnection()->prepare($sql);
+        $stmt->execute();
+        $count = $stmt->fetchColumn();
+        return $count ;
+    }catch (PDOException $e){
+        throw new PDOException('Erreur lors de Récupération des Catégories : '. $e->getMessage());
+    }
+}
+
 
 public function updateCategory() {
     if (empty($this->categoryTitle) || empty($this->categoryDescription) || empty($this->categoryId)) {

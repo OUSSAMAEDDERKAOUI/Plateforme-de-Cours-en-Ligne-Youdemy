@@ -337,13 +337,4 @@ abstract class Course
 
 
 
-    public function getEnrolledStudents()
-    {
-        return [];
-    }
-
-    public function changeStatus($newStatus)
-    {
-        $this->courseStatus = $newStatus;
-    }
 }

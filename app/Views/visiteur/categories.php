@@ -2,8 +2,31 @@
 // session_start();
 // echo $_SESSION['user_role'];
 require_once __DIR__ . '../../../Models/Category.php';
-$categories = Category::showVisiteurCategory();
+// $categories = Category::showVisiteurCategory();
 // print_r($categories);
+
+
+
+
+$limit = 6;
+
+if(isset($_GET['page'])){
+    $page = (int)$_GET['page'];
+}else{
+    $page = 1;
+}
+
+$depart = ($page - 1) * $limit;
+
+$categories = Category::showVisiteurCategories($depart,$limit);
+
+
+
+$totalCategories = Category::countCategories();
+
+$totalPages = ceil($totalCategories / $limit);
+
+
 
 ?>
 
@@ -68,7 +91,7 @@ $categories = Category::showVisiteurCategory();
         <div class="max-w-7xl mx-auto">
             <div id="coursesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <?php  foreach($categories AS $category) : ?>
-<?php $image=$category->getCategoryConverture() ;?>
+                <?php $image=$category->getCategoryConverture() ;?> 
                 <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
                     <img src="/<?php echo htmlspecialchars($category->getCategoryConverture()) ;?>" alt="photo de converture" class="w-full h-48 object-cover">
                     <div class="p-6">
@@ -85,11 +108,19 @@ $categories = Category::showVisiteurCategory();
                     </div>
                 </div>
                 <?php endforeach ;?>
+
+                
             </div>
 
             <!-- Pagination -->
-            <div class="flex justify-center items-center space-x-2 mt-8" id="pagination">
-                <!-- La pagination sera injectée ici via JavaScript -->
+            <div class="flex justify-center items-center space-x-2 mt-8" id="">
+                <?php if ($page > 1): ?>
+                    <a href="?page=<?php echo $page - 1; ?>" class="px-4 py-2 bg-blue-600 text-white rounded-lg mr-2 hover:bg-blue-800">Précédent</a>
+                <?php endif; ?>
+
+                <?php if ($page < $totalPages): ?>
+                    <a href="?page=<?php echo $page + 1; ?>" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-800">Suivant</a>
+                <?php endif; ?>
             </div>
         </div>
     </main>

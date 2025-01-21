@@ -30,6 +30,19 @@ class Database {
         return $this->pdo;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 ?>
 
 <!-- MySQL utilise des codes comme :
