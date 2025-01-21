@@ -12,7 +12,7 @@ $course_cat_id = $_GET['id'];
 $courses = CourseDocument::showCategoryCourses($course_cat_id);
 $CoursesVideo = CourseVideo::showCategoryCourses($course_cat_id);
 
-$course = Course::getCourseById($courseId);
+// $course = Course::getCourseById($courseId);
 
 // print_r($courses);
 
@@ -77,7 +77,7 @@ $course = Course::getCourseById($courseId);
 
         <!-- Liste des cours -->
         <div class="max-w-7xl mx-auto">
-            <h3 class="text-xl font-semibold mb-6 mt-16">Les cours De Type Document</h3>
+            <h3 class="text-xl font-semibold mb-6 mt-16">Mes cours De Type Document</h3>
             <div id="coursesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <?php foreach ($courses as $course) : ?>
                     <?php $categoryTitle = Course::getCategoryTitleById($course->getCategoryId()); ?>
@@ -112,7 +112,7 @@ $course = Course::getCourseById($courseId);
                                 <a href="../user/login.php">
                                     <button onclick=""
                                         class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                                        Voir le Cours
+                                        Voir le Cour
                                     </button>
                                 </a>
                             </div>
@@ -123,7 +123,7 @@ $course = Course::getCourseById($courseId);
 
 
 
-            <h3 class="text-xl font-semibold mb-6 mt-16">Les cours De Type Vidéo </h3>
+            <h3 class="text-xl font-semibold mb-6 mt-16">Mes cours De Type Vidéo </h3>
             <div id="coursesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <?php foreach ($CoursesVideo as $CourseVideo) : ?>
                     <?php $categoryTitle = Course::getCategoryTitleById($CourseVideo->getCategoryId()); ?>

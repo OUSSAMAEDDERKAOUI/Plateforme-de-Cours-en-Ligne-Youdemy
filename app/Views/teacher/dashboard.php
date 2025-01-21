@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $tags = $_POST['courseTags'];
         print_r($tags);
 
-        $teacherId = 1; 
+        $teacherId = $_SESSION['user_id']; 
 
         $upload_img = $_FILES['course_image'];
 
@@ -264,7 +264,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || isset($_POST['deletecourse'])) {
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm text-gray-900"><?php echo " $categoryTitle " ?></div>
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
+                                            <td class="px-6 py-4 whitespace-Wrap">
                                                 <div class="text-sm text-gray-500"><?php echo htmlspecialchars($courseDocument->getCoursesDescription()); ?></div>
                                             </td>
 
@@ -324,7 +324,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || isset($_POST['deletecourse'])) {
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm text-gray-900"><?php echo " $categoryTitle " ?></div>
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
+                                            <td class="px-6 py-4 whitespace-wrap">
                                                 <div class="text-sm text-gray-500"><?php echo htmlspecialchars($courseVideo->getCoursesDescription()); ?></div>
                                             </td>
 

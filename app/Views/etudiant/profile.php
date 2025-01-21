@@ -22,6 +22,16 @@ else {
     header('Location: ../views/login.php');
 
 }
+
+
+}
+if (isset($_POST['dec'])) {
+    session_unset();
+
+    session_destroy();
+
+    header('Location: ../user/login.php');
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -90,7 +100,7 @@ else {
                 </div>
                 <nav class="space-y-2">
                   
-                <a href="./etudiant.php" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600" data-section="courses">
+                <a href="./mesCourses.php" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600" data-section="courses">
                         <i class="fas fa-book"></i>
                         <span>Mes cours</span>
                     </a>
@@ -103,6 +113,12 @@ else {
                         <i class="fas fa-user"></i>
                         <span>Mon profil</span>
                     </a>
+                    <form action="" method="POST">
+                            <button name="dec" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Déconnexion
+                            </button>
+                </form>
                 </nav>
             </div>
         </aside>

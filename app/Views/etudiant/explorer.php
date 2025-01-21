@@ -23,7 +23,14 @@ else {
     header('Location: ../views/login.php');
 }
 }
+if (isset($_POST['dec'])) {
+    session_unset();
 
+    session_destroy();
+
+    header('Location: ../user/login.php');
+    exit();
+}
 $categories = Category::showVisiteurCategory();
 ?>
 <!DOCTYPE html>
@@ -92,11 +99,11 @@ $categories = Category::showVisiteurCategory();
                 </div>
                 <nav class="space-y-2">
                   
-                <a href="./etudiant.php" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600" data-section="courses">
+                <a href="./mesCourses.php" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600" data-section="courses">
                         <i class="fas fa-book"></i>
                         <span>Mes cours</span>
                     </a>
-                    <a href="./etudiant_explorer.php" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600" data-section="explore">
+                    <a href="./explorer.php" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600" data-section="explore">
                         <i class="fas fa-search"></i>
                         <span>Explorer</span>
                     </a>
@@ -105,6 +112,12 @@ $categories = Category::showVisiteurCategory();
                         <i class="fas fa-user"></i>
                         <span>Mon profil</span>
                     </a>
+                    <form action="" method="POST">
+                            <button name="dec" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Déconnexion
+                            </button>
+                </form>
                 </nav>
             </div>
         </aside>

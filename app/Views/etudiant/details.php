@@ -97,7 +97,7 @@ if (isset($_POST['dec'])) {
                 </div>
                 <nav class="space-y-2">
                   
-                <a href="./etudiant.php" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600" data-section="courses">
+                <a href="./mesCourses.php" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600" data-section="courses">
                         <i class="fas fa-book"></i>
                         <span>Mes cours</span>
                     </a>
@@ -127,7 +127,7 @@ if (isset($_POST['dec'])) {
                 <!-- Header -->
                 <header class="flex justify-between items-center mb-8">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-800">Bonjour, Alex 👋</h1>
+                        <h1 class="text-2xl font-bold text-gray-800">Bonjour , Bienvenue dans le Cours👋</h1>
                         <p class="text-gray-600">Continuez votre apprentissage</p>
                     </div>
                     <div class="flex items-center space-x-4">
@@ -151,7 +151,6 @@ if (isset($_POST['dec'])) {
 
 
 
-            <!-- //////////////////////////////////////////////////////////////////: -->
 
 
 
@@ -160,78 +159,58 @@ if (isset($_POST['dec'])) {
                 <?php
 
 
-                require_once '../classes/membre.php';
-
-                $membre = new Membre("", "", "", "", "", "","");
 
 
 
-                $id_article = $_GET['id'];
+                $course_id = $_GET['id'];
+                $course=Course::getCourseById($course_id);
+              $categoryTitle = Course::getCategoryTitleById($course->getCategoryId()); 
 
 
-                $result = $membre->showDetails($id_article);
-                if ($result) {
-                    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+             
 
-                        $image = $row['image'];
-                        $image_user=$row['image_user'];
                         echo '  <article class="bg-white rounded-lg shadow-lg overflow-hidden animate__animated animate__fadeIn">
     <div class="relative">
-        <img src="' . htmlspecialchars($image) . '" alt="" class="w-full h-96 object-cover">
+        <img src="/' .  htmlspecialchars($course->getCourseConverture()). '" alt="" class="w-full h-96 object-cover">
        
 
 
         <div class="absolute top-0 right-0 m-2">
             <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-sm">
-              ' . $row['categorieTitre'] . ' </span>
+              ' .  $categoryTitle . ' </span>
         </div>';
       
    echo' </div>
     <div class="p-6">';
                         echo '<div class="mb-8">';
-                        echo ' <h1 class="text-4xl font-bold text-gray-900 mb-4">' . $row['articleTitre'] . '</h1>
-        
-        <div class="flex items-center gap-4 mb-6">
-            <img src="'.htmlspecialchars($image_user).'" class="w-12 h-12 rounded-full" alt="Author">
+                        echo ' <h1 class="text-4xl font-bold text-gray-900 mb-4">' . htmlspecialchars($course->getCourseTitle()).'</h1>
+                         <div class="flex items-center gap-4 mb-6">
             <div>
-                <p class="font-semibold text-gray-900">' . ' ' . $row['nom'] . '  ' . $row['prenom'] . '  </p>
-                <p class="text-gray-500 text-sm">Publié le ' . $row['date_publication'] . '</p>
+                <p class="text-gray-500 text-sm">Publié le ' .htmlspecialchars($course->getCreationDate()).'</p>
             </div>
         </div>
+                        <p class="text-gray-500 text-sm"> ' . htmlspecialchars($course->getCoursesDescription()). '</p>
+
+       
     </div>
-          <pre class="text-gray-800 mb-2 whitespace-pre-line">' . $row['contenu'] . '
-        </pre>
+
+
+        <iframe src="/' .htmlspecialchars($course->getCourseContent()). ' " height="800" width="90%"  class ="ml-16"" title=""></iframe>
+
         <br>';
-            require_once '../classes/article_tag.php';
-                $TagArticle=new TagArticle("","");
-               $results= $TagArticle->getTagsByArticle($id_article);
-               if(count($results) > 0){
-                echo'<div class="flex  text-center gap-2 m-4 ">';
-                foreach($results as $res){
-                   echo' <div class="px-3 py-1  text-blue-600 rounded-full text-sm"># '.$res['nom_tag'].'</div>';
-                }
-                echo'</div>';
-            }
-      
+        
    echo' </div>';
      
 echo'</article> ';
-                    }
-                }
                 
-                echo'<div class="m-4 flex items-center gap-2">
-                <a href="../functions/addLike.php?id='.$id_article.'">';
                 
-                  require_once '../classes/favoris.php';
-                    $showLikes=new Favoris("","");
-                    $Likes=$showLikes->showLikes($id_article);
-               echo' <button class="bg-blue-500 text-white px-4 py-2 rounded flex items-center gap-2">
+                echo'<div class="m-4 flex items-center gap-2">';
+                
+               echo ' <button class="bg-blue-500 text-white px-4 py-2 rounded flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
                     </svg>
-                  
-
-                  '.$Likes['likescount'] .' J\'aimes
+                  J\'aimes
                    
                </button>
                 </a>
@@ -248,28 +227,7 @@ echo'</article> ';
             
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 mt-12">
-        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center">
-                <div class="text-white">
-                    <h3 class="text-2xl font-bold">MelodyHub</h3>
-                    <p class="mt-2 text-gray-400">Votre passerelle vers la culture</p>
-                </div>
-                <div class="flex space-x-6">
-                    <a href="#" class="text-gray-400 hover:text-gray-300">
-                        <i class="fab fa-facebook text-xl"></i>
-                    </a>
-                    <a href="#" class="text-gray-400 hover:text-gray-300">
-                        <i class="fab fa-twitter text-xl"></i>
-                    </a>
-                    <a href="#" class="text-gray-400 hover:text-gray-300">
-                        <i class="fab fa-instagram text-xl"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </footer>
+   
 
 
     </html>

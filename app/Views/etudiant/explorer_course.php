@@ -8,13 +8,15 @@ require_once __DIR__ . '../../../Models/CourseVideo.php';
 require_once __DIR__ . '../../../Models/Users.php';
 require_once __DIR__ . '../../../../config/database.php';
 require_once __DIR__ . '../../../Models/Category.php';
+require_once __DIR__ . '../../../Models/Etudiants.php';
+
 
 
 $course_cat_id = $_GET['id'];
 $courses = CourseDocument::showCategoryCourses($course_cat_id);
 $CoursesVideo = CourseVideo::showCategoryCourses($course_cat_id);
 
-$course = Course::getCourseById($courseId);
+// $course = Course::getCourseById($courseId);
 
 
 if (!Users::isAuth('visiteur')) {
@@ -30,8 +32,29 @@ else {
     header('Location: ../views/login.php');
 }
 }
+if (isset($_POST['dec'])) {
+    session_unset();
 
+    session_destroy();
+
+    header('Location: ../user/login.php');
+    exit();
+}
 $categories = Category::showVisiteurCategory();
+
+if($_SERVER['REQUEST_METHOD']=='POST'){
+    if(isset($_POST['inscris'])){
+        $courseId=$_GET['id'];
+        // echo 'courseId' .$courseId . '<br>';
+        $etudiantId=$_SESSION['user_id'];
+        // echo 'etudiantId'. $etudiantId;
+        $inscris=new Etudiants("","","","","","");
+       $inscris->inscrire($etudiantId,$courseId) ;
+header('location: ../etudiant/details.php?id='.$courseId);
+    }
+}
+
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -99,11 +122,11 @@ $categories = Category::showVisiteurCategory();
                 </div>
                 <nav class="space-y-2">
                   
-                <a href="./etudiant.php" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600" data-section="courses">
+                <a href="./mesCourses.php" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600" data-section="courses">
                         <i class="fas fa-book"></i>
                         <span>Mes cours</span>
                     </a>
-                    <a href="./etudiant_explorer.php" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600" data-section="explore">
+                    <a href="./explorer.php" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600" data-section="explore">
                         <i class="fas fa-search"></i>
                         <span>Explorer</span>
                     </a>
@@ -112,6 +135,12 @@ $categories = Category::showVisiteurCategory();
                         <i class="fas fa-user"></i>
                         <span>Mon profil</span>
                     </a>
+                    <form action="" method="POST">
+                            <button name="dec" class="nav-link flex items-center space-x-3 p-3 rounded-lg text-gray-600">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Déconnexion
+                            </button>
+                </form>
                 </nav>
             </div>
         </aside>
@@ -179,12 +208,15 @@ $categories = Category::showVisiteurCategory();
                             <div class="flex justify-between items-center">
                                 <span class="text-lg font-bold text-indigo-600"><?php echo htmlspecialchars($course->getCourseType()); ?></span>
                                 <span class="text-lg font-bold text-indigo-600">Gratuit</span>
-                                <a href="../user/login.php">
-                                    <button onclick=""
+                                <!-- <a href="../etudiant/details.php?id=<?php echo $course->getCourseId() ; ?>"> -->
+                                    <form action="?id=<?php echo $course->getCourseId() ; ?>" method="POST">
+                                    <button  name="inscris"
                                         class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
                                         Je M'inscris
                                     </button>
-                                </a>
+                                    </form>
+                                   
+                                <!-- </a> -->
                             </div>
                         </div>
                     </div>
@@ -213,12 +245,12 @@ $categories = Category::showVisiteurCategory();
                             <div class="flex justify-between items-center">
                                 <span class="text-lg font-bold text-indigo-600"><?php echo htmlspecialchars($CourseVideo->getCourseType()); ?></span>
                                 <span class="text-lg font-bold text-indigo-600">Gratuit</span>
-                                <a href="../user/login.php">
-                                    <button onclick=""
+                                <form action="?id=<?php echo $CourseVideo->getCourseId() ; ?>" method="POST">
+                                    <button  name="inscris"
                                         class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                                        Détails
+                                        Je M'inscris
                                     </button>
-                                </a>
+                                    </form>
                             </div>
                         </div>
                     </div>
